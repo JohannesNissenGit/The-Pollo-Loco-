@@ -38,9 +38,15 @@ checkForRunning();
 /**
  * checks if player is moving and changes animation
  */
-
 function checkForRunning() {
     setInterval( function() {
+    if (isMovingRight) {
+        if (currentCharacterImage=='img/character/02_WALK/W-21.png'){
+            currentCharacterImage = 'img/character/02_WALK/W-22.png';
+        } else {
+            currentCharacterImage = 'img/character/02_WALK/W-21.png';
+        }
+    }
     if (isMovingLeft) {
         if (currentCharacterImage=='img/character/02_WALK/W-21.png'){
             currentCharacterImage = 'img/character/02_WALK/W-22.png';
@@ -48,8 +54,6 @@ function checkForRunning() {
             currentCharacterImage = 'img/character/02_WALK/W-21.png';
         }
     }
-    isMovingRight
-
 },200);
 }
 
@@ -68,7 +72,7 @@ function draw() {
 
 function updateCharacter() {
     let base_image = new Image();
-    base_image.src = 'img/character/01_IDLE/IDLE/I-1.png';
+    base_image.src = currentCharacterImage;
 
     let timePassedSinceJump = new Date().getTime() - lastJumpStarted;
     if (timePassedSinceJump < JUMP_TIME) {
