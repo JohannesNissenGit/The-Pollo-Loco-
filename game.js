@@ -1,4 +1,4 @@
-//-----------------variables
+//-----------------variables-------------------------------------------
 
 //general canvas
 let canvas;
@@ -11,6 +11,7 @@ let isMovingRight = false;
 let isMovingLeft = false;
 let lastJumpStarted = 0;
 let isFalling = false;
+let isJumping = false;
 let currentCharacterImage = 'img/character-1.png';
 let characterRunningGraphicsRight = ['./img/character/02_WALK/W-21.png', './img/character/02_WALK/W-22.png', './img/character/02_WALK/W-23.png', './img/character/02_WALK/W-24.png', './img/character/02_WALK/W-25.png', './img/character/02_WALK/W-26.png'];
 let characterRunningGraphicsLeft = ['./img/character/02_WALK/W-L-21.png', './img/character/02_WALK/W-L-22.png', './img/character/02_WALK/W-L-23.png', './img/character/02_WALK/W-L-24.png', './img/character/02_WALK/W-L-25.png', './img/character/02_WALK/W-L-26.png'];
@@ -22,12 +23,17 @@ let bg_elem_2_x = 0;
 let bg_elem_3_x = 0;
 let cloudoffset = 0;
 
-//-------------------constants
+//enemies
+let chickens = [];
+let enemy_small_x = 0;
 
-let JUMP_TIME = 240;
+//-------------------constants-----------------------------------------
 let GAME_SPEED = 5;
+let JUMP_TIME_UP = 270; //240
+let WHOLE_JUMP_TIME = JUMP_TIME_UP + JUMP_TIME_UP * 1.8;
 
-//---------------------functions
+
+//---------------------functions-----------------------------------------
 
 /**
  * initialise display
@@ -35,22 +41,27 @@ let GAME_SPEED = 5;
 function init() {
     canvas = document.getElementById('canvas');
     ctx = canvas.getContext("2d");
+    createEnemyList();
     checkForRunning();
     draw();
     calcuteCloudOffset();
+    calculateChickenPosition();
     listenForKeys();
 }
+
 
 /**
  * checks if player is moving and changes animation
  */
 function checkForRunning() {
     setInterval(function () {
-        if (isMovingRight) {
-            let index = characterGraphicsIndex % characterRunningGraphicsRight.length;
-            currentCharacterImage = characterRunningGraphicsRight[index];
-            characterGraphicsIndex = characterGraphicsIndex + 1;
-        }
+        let timePassedSinceJump = new Date().getTime() - lastJumpStarted;
+        //if ()
+            if (isMovingRight) {
+                let index = characterGraphicsIndex % characterRunningGraphicsRight.length;
+                currentCharacterImage = characterRunningGraphicsRight[index];
+                characterGraphicsIndex = characterGraphicsIndex + 1;
+            }
         if (isMovingLeft) {
             let index = characterGraphicsIndex % characterRunningGraphicsLeft.length;
             currentCharacterImage = characterRunningGraphicsLeft[index];
@@ -65,8 +76,12 @@ function checkForRunning() {
 function draw() {
     drawBackground();
     updateCharacter();
+    drawChicken();
     requestAnimationFrame(draw);
 }
+
+
+//---------player model--------------------
 
 /**
  * player model display
@@ -77,7 +92,7 @@ function updateCharacter() {
     base_image.src = currentCharacterImage;
 
     let timePassedSinceJump = new Date().getTime() - lastJumpStarted;
-    if (timePassedSinceJump < JUMP_TIME) {
+    if (timePassedSinceJump < JUMP_TIME_UP) {
         character_y = character_y - 14;
     } else {
         if (character_y < 110) {
@@ -90,6 +105,10 @@ function updateCharacter() {
         ctx.drawImage(base_image, character_x, character_y, base_image.width * 0.25, base_image.height * 0.25);
     };
 }
+
+
+//------------Objects-------------------------
+
 /**
  * drawBackground: background display
  */
@@ -102,12 +121,11 @@ function drawBackground() {
     if (sky.complete) {
         ctx.drawImage(sky, 0, 0, sky.width * 0.4, sky.height * 0.4);
     }
-
     drawGround();
 }
 
 /**
- * drawGround: drawing stuff on ground
+ * drawGround: drawing stuff on ground + clouds + background
  */
 function drawGround() {
     //ctx.fillStyle = '#FFE699';  //old ground layer
@@ -117,12 +135,18 @@ function drawGround() {
         bg_elem_1_x = bg_elem_1_x - GAME_SPEED;
         bg_elem_2_x = bg_elem_2_x - (0.5 * GAME_SPEED);
         bg_elem_3_x = bg_elem_3_x - (0.35 * GAME_SPEED);
+        for (i = 0; i < chickens.length; i++) {
+            chickens[i].position_x = chickens[i].position_x - GAME_SPEED;
+        }
     }
 
     if (isMovingLeft) {
         bg_elem_1_x = bg_elem_1_x + GAME_SPEED;
         bg_elem_2_x = bg_elem_2_x + (0.4 * GAME_SPEED);
         bg_elem_3_x = bg_elem_3_x + (0.25 * GAME_SPEED);
+        for (i = 0; i < chickens.length; i++) {
+            chickens[i].position_x = chickens[i].position_x + GAME_SPEED;
+        }
     }
     drawclouds();
     drawBackgrounds();
@@ -173,6 +197,61 @@ function calcuteCloudOffset() {
     }, 50)
 }
 
+
+//-------------Enemies--------------------------------------------------
+
+/**
+ * createEnemyList: initializes planned enemies for level
+ */
+function createEnemyList() {
+    chickens = [
+        createChicken('brown', bg_elem_1_x + 600, 2),
+        createChicken('yellow', bg_elem_1_x + 800, 4),
+        createChicken('yellow', bg_elem_1_x + 1000, (Math.random() * 5))
+    ]
+}
+
+/**
+ * calculateChickenPosition: keeps track of current chicken position in x direction and updates chickens array
+ */
+function calculateChickenPosition() {
+    setInterval(function () {
+        for (i = 0; i < chickens.length; i++) {
+            let chicken = chickens[i];
+            chicken.position_x = chicken.position_x - chicken.speed;
+        }
+    }, 50)
+}
+
+/**
+ * drawChicken(): function to display small enemy chicken
+ */
+function drawChicken() {
+    for (i = 0; i < chickens.length; i++) {
+        let enemy = chickens[i];
+        addBackgroundObject(enemy.img, enemy.position_x, enemy.position_y, enemy.scale);
+    }
+}
+
+/**
+ * createChicken: constructs chicken-specific object with all regarding information
+ * @param {string} type 
+ * @param {number} position_x 
+ */
+function createChicken(type, position_x, speed) {
+    return {
+        "img": "./img/enemies/chicken_" + type + "/1_walk.png",
+        "position_x": position_x,
+        "position_y": 325,
+        "scale": 0.32,
+        "speed": speed
+    };
+}
+
+
+
+//------movement------------------------------------------------------
+
 /**
  *listenForKeys: enable and distribute movement
  */
@@ -194,9 +273,11 @@ function listenForKeys() {
 
         let timePassedSinceJump = new Date().getTime() - lastJumpStarted;
 
-        if (e.code == 'Space' && timePassedSinceJump > (JUMP_TIME + JUMP_TIME * 1.7)) {
+        if (e.code == 'Space' && timePassedSinceJump > WHOLE_JUMP_TIME) { 
             lastJumpStarted = new Date().getTime();
+            isJumping = true;       // TEST JUMPING /////////////////////////////////////////
         }
+        else { isJumping = false; } // TEST JUMPING /////////////////////////////////////////
     });
 
     document.addEventListener("keyup", e => {
