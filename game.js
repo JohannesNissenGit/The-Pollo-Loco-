@@ -12,15 +12,15 @@ let isMovingLeft = false;
 let lastJumpStarted = 0;
 let isFalling = false;
 let currentCharacterImage = 'img/character-1.png';
-let characterRunningGraphicsRight = ['./img/character/02_WALK/W-21.png', './img/character/02_WALK/W-22.png', './img/character/02_WALK/W-23.png','./img/character/02_WALK/W-24.png', './img/character/02_WALK/W-25.png', './img/character/02_WALK/W-26.png'];
-let characterRunningGraphicsLeft =  ['./img/character/02_WALK/W-L-21.png', './img/character/02_WALK/W-L-22.png', './img/character/02_WALK/W-L-23.png','./img/character/02_WALK/W-L-24.png', './img/character/02_WALK/W-L-25.png', './img/character/02_WALK/W-L-26.png'];
+let characterRunningGraphicsRight = ['./img/character/02_WALK/W-21.png', './img/character/02_WALK/W-22.png', './img/character/02_WALK/W-23.png', './img/character/02_WALK/W-24.png', './img/character/02_WALK/W-25.png', './img/character/02_WALK/W-26.png'];
+let characterRunningGraphicsLeft = ['./img/character/02_WALK/W-L-21.png', './img/character/02_WALK/W-L-22.png', './img/character/02_WALK/W-L-23.png', './img/character/02_WALK/W-L-24.png', './img/character/02_WALK/W-L-25.png', './img/character/02_WALK/W-L-26.png'];
 let characterGraphicsIndex = 0;
 
 //background
 let bg_elem_1_x = 0;
 let bg_elem_2_x = 0;
-let bg_elem_3_x = 0 ;
-
+let bg_elem_3_x = 0;
+let cloudoffset = 0;
 
 //-------------------constants
 
@@ -37,7 +37,7 @@ function init() {
     ctx = canvas.getContext("2d");
     checkForRunning();
     draw();
-
+    calcuteCloudOffset();
     listenForKeys();
 }
 
@@ -96,11 +96,13 @@ function updateCharacter() {
 function drawBackground() {
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    let sky = new Image();
+
+    let sky = new Image(); //skybox
     sky.src = './img/background/05_Sky_1920-1080px.png';
     if (sky.complete) {
         ctx.drawImage(sky, 0, 0, sky.width * 0.4, sky.height * 0.4);
     }
+
     drawGround();
 }
 
@@ -108,9 +110,9 @@ function drawBackground() {
  * drawGround: drawing stuff on ground
  */
 function drawGround() {
-    ctx.fillStyle = '#FFE699';
-    ctx.fillRect(0, 375, canvas.width, canvas.height - 375);
-
+    //ctx.fillStyle = '#FFE699';  //old ground layer
+    //ctx.fillRect(0, 375, canvas.width, canvas.height - 375);
+    addBackgroundObject('./img/background/06_Ground.png', 0, 320, 0.4);  //ground layer
     if (isMovingRight) {
         bg_elem_1_x = bg_elem_1_x - GAME_SPEED;
         bg_elem_2_x = bg_elem_2_x - (0.5 * GAME_SPEED);
@@ -122,26 +124,53 @@ function drawGround() {
         bg_elem_2_x = bg_elem_2_x + (0.4 * GAME_SPEED);
         bg_elem_3_x = bg_elem_3_x + (0.25 * GAME_SPEED);
     }
-    addBackgroundObject('./img/background/03_farBG/Completo.png', bg_elem_3_x, -110, 0.45);  //far away background layer
-    addBackgroundObject('./img/background/03_farBG/Completo.png', bg_elem_3_x + 1726 , -110, 0.45); //second tile with x offset to connect to first tile
+    drawclouds();
+    drawBackgrounds();
 
-    addBackgroundObject('./img/background/02_middleBG/completo.png', bg_elem_2_x, 70, 0.28);  //middle distanced background layer
-    addBackgroundObject('./img/background/02_middleBG/completo.png', bg_elem_2_x + 1050, 70, 0.28);
-
-    addBackgroundObject('./img/background/01_nearBG/completo.png', bg_elem_1_x, 110, 0.25);    //nearest background layer
-    addBackgroundObject('./img/background/01_nearBG/completo.png', bg_elem_1_x + 960, 110, 0.25);
 }
 
 /**
  * addBackgroundObject: general function to create background objects 
  */
-
-function addBackgroundObject(src, offsetX, offsetY, scale,) {
+function addBackgroundObject(src, offsetX, offsetY, scale) {
     let base_image = new Image();
     base_image.src = src;
     if (base_image.complete) {
         ctx.drawImage(base_image, offsetX, offsetY, base_image.width * scale, base_image.height * scale);
     }
+}
+
+/**
+ * drawBackgrounds: adds 3 layers of background to game (change length of level via i,j,k)
+ */
+function drawBackgrounds() {
+    for (i = 0; i < 3; i++) {
+        addBackgroundObject('./img/background/03_farBG/Completo.png', bg_elem_3_x + i * 1726, -110, 0.45);  //far away background layer
+    }
+
+    for (j = 0; j < 4; j++) {
+        addBackgroundObject('./img/background/02_middleBG/completo.png', bg_elem_2_x + j * 1050, 70, 0.28);  //middle distanced background layer
+    }
+
+    for (k = 0; k < 6; k++) {
+        addBackgroundObject('./img/background/01_nearBG/completo.png', bg_elem_1_x + k * 960, 110, 0.25);    //nearest background layer
+    }
+}
+
+/**
+ * drawclouds: adds cloud objects
+ */
+function drawclouds() {
+    addBackgroundObject('img/background/04_clouds/Completo.png', 100 - cloudoffset, -60, 0.5);
+}
+
+/**
+ * calcuteCloudOffset(): calculates cloud images offset in x direction
+ */
+function calcuteCloudOffset() {
+    setInterval(function () {
+        cloudoffset = cloudoffset + 0.25;
+    }, 50)
 }
 
 /**
