@@ -33,12 +33,12 @@ let GAME_SPEED = 5;
 let JUMP_TIME_UP = 270; //240
 let WHOLE_JUMP_TIME = JUMP_TIME_UP + JUMP_TIME_UP * 1.9;
 let AUDIO_RUNNING = new Audio('./sounds/cartoon_running.mp3');
-AUDIO_RUNNING.volume = 0.4;
+AUDIO_RUNNING.volume = 0.9;
 let AUDIO_JUMPING = new Audio('./sounds/cartoon_jump.mp3');
-AUDIO_JUMPING.volume = 0.4;
-let AUDIO_LOOP = new Audio('./sounds/intro_loop.mp3');
+AUDIO_JUMPING.volume = 0.6;
+let AUDIO_LOOP = new Audio('./sounds/mariachi.mp3');
 AUDIO_LOOP.loop = true;
-
+AUDIO_LOOP.volume = 0.1;
 //---------------------functions-----------------------------------------
 
 /**
@@ -47,7 +47,7 @@ AUDIO_LOOP.loop = true;
 function init() {
     canvas = document.getElementById('canvas');
     ctx = canvas.getContext("2d");
-    AUDIO_LOOP.play();
+    StartMusic();
     createEnemyList();
     checkForRunning();
     draw();
@@ -56,6 +56,12 @@ function init() {
     listenForKeys();
 }
 
+/**
+ * StartMusic: starts playing the music theme for the level
+ */
+async function StartMusic() {
+AUDIO_LOOP.play();
+}
 
 /**
  * checks if player is moving and changes animation
