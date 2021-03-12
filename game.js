@@ -36,7 +36,8 @@ let AUDIO_RUNNING = new Audio('./sounds/cartoon_running.mp3');
 AUDIO_RUNNING.volume = 0.4;
 let AUDIO_JUMPING = new Audio('./sounds/cartoon_jump.mp3');
 AUDIO_JUMPING.volume = 0.4;
-
+let AUDIO_LOOP = new Audio('./sounds/intro_loop.mp3');
+AUDIO_LOOP.loop = true;
 
 //---------------------functions-----------------------------------------
 
@@ -46,6 +47,7 @@ AUDIO_JUMPING.volume = 0.4;
 function init() {
     canvas = document.getElementById('canvas');
     ctx = canvas.getContext("2d");
+    AUDIO_LOOP.play();
     createEnemyList();
     checkForRunning();
     draw();
