@@ -27,10 +27,15 @@ let cloudoffset = 0;
 let chickens = [];
 let enemy_small_x = 0;
 
+
 //-------------------constants-----------------------------------------
 let GAME_SPEED = 5;
 let JUMP_TIME_UP = 270; //240
-let WHOLE_JUMP_TIME = JUMP_TIME_UP + JUMP_TIME_UP * 1.8;
+let WHOLE_JUMP_TIME = JUMP_TIME_UP + JUMP_TIME_UP * 1.9;
+let AUDIO_RUNNING = new Audio('./sounds/cartoon_running.mp3');
+AUDIO_RUNNING.volume = 0.4;
+let AUDIO_JUMPING = new Audio('./sounds/cartoon_jump.mp3');
+AUDIO_JUMPING.volume = 0.4;
 
 
 //---------------------functions-----------------------------------------
@@ -58,14 +63,19 @@ function checkForRunning() {
         let timePassedSinceJump = new Date().getTime() - lastJumpStarted;
         //if ()
             if (isMovingRight) {
+                AUDIO_RUNNING.play();
                 let index = characterGraphicsIndex % characterRunningGraphicsRight.length;
                 currentCharacterImage = characterRunningGraphicsRight[index];
                 characterGraphicsIndex = characterGraphicsIndex + 1;
             }
         if (isMovingLeft) {
+            AUDIO_RUNNING.play();
             let index = characterGraphicsIndex % characterRunningGraphicsLeft.length;
             currentCharacterImage = characterRunningGraphicsLeft[index];
             characterGraphicsIndex = characterGraphicsIndex + 1;
+        }
+        if(!isMovingLeft && !isMovingRight) {
+            AUDIO_RUNNING.pause();
         }
     }, 60);
 }
@@ -275,6 +285,7 @@ function listenForKeys() {
 
         if (e.code == 'Space' && timePassedSinceJump > WHOLE_JUMP_TIME) { 
             lastJumpStarted = new Date().getTime();
+            AUDIO_JUMPING.play();
             isJumping = true;       // TEST JUMPING /////////////////////////////////////////
         }
         else { isJumping = false; } // TEST JUMPING /////////////////////////////////////////
