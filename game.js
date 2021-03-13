@@ -34,11 +34,19 @@ let chickens = [];
 let enemy_small_x = 0;
 
 //items
-let placedBottles = [400, 1700, 2450];
-let collectedBottles = 0;
+let placedBottles = [200, 600, 990, 1700, 2450];
+let collectedBottles = 50;
+let bottleThrowTime = 0;
+let thrownBottle_x = 0; //x position of thrown object
+let thrownBottle_y = 0;
+let tacos = [
+    { "tacoposition_x": 500, "tacoposition_y": 350, "tacoscale": 0.1 },
+    { "tacoposition_x": 900, "tacoposition_y": 350, "tacoscale": 0.1 }
+];
 
 //-------------------constants-----------------------------------------
 let GAME_SPEED = 5; //variable to control speed of game
+let GRAVITY = 7;    //gravity downwards pull for thrown objects
 let JUMP_TIME_UP = 270; //240
 let WHOLE_JUMP_TIME = JUMP_TIME_UP + JUMP_TIME_UP * 1.9;
 let COLLISION_DETECT_OFFSET_Y = 215;    //bridges offset in y direction between character and small enemies
@@ -47,6 +55,8 @@ let DAMAGE_ONE_HIT = 20; //damage received for one hit by regular enemy
 
 let LEVEL_WALL_START = -5; //invisible wall on (left) start side of level
 let LEVEL_WALL_FINISH = -2500; //invisible wall on (right) end side of level, increases with negatively
+
+let TACO_HEALTH_POTION = 40; //amount of health gained by picking up taco powerup
 
 //--------------------sounds----------------------------------------
 let AUDIO_RUNNING = new Audio('./sounds/cartoon_running.mp3');
@@ -58,6 +68,10 @@ AUDIO_LOOP.loop = true;
 AUDIO_LOOP.volume = 0.1;
 let AUDIO_BOTTLE_PICKUP = new Audio('./sounds/powerup_2.mp3');
 AUDIO_BOTTLE_PICKUP.volume = 0.6;
+let AUDIO_BOTTLE_THROW = new Audio('./sounds/bottle_throw_short.mp3')
+AUDIO_BOTTLE_THROW.volume = 0.6;
+let AUDIO_TACO_PICKUP = new Audio('./sounds/powerup_1.mp3')
+AUDIO_TACO_PICKUP.volume = 0.6;
 
 //---------------------functions-----------------------------------------
 
@@ -132,12 +146,14 @@ function checkForJumping() {
 }
 
 /**
- * checkForCollision(): checks if character is in collision radius with enemies and distributes damage if applicable
+ * checkForCollision(): checks if character is in collision radius with relevant objects
  */
 function checkForCollision() {
     setInterval(function () {
         checkCollisionSmallEnemies();
         checkCollisionBottles();
+        checkCollisionTacos();
+        checkCollisionBoss();
     }, 50)
 }
 
@@ -161,9 +177,9 @@ function checkCollisionSmallEnemies() {
 function checkCollisionBottles() {
     for (let i = 0; i < placedBottles.length; i++) {
         let object_x = placedBottles[i];
-        if ((object_x - 30) < (character_x -bg_elem_1_x) && (object_x + 30) > (character_x - bg_elem_1_x)) { //check x direction 
-            
-            if (character_y > 100) {              
+        if ((object_x - 30) < (character_x - bg_elem_1_x) && (object_x + 30) > (character_x - bg_elem_1_x)) { //check x direction 
+
+            if (character_y > 100) {
                 placedBottles.splice(i, 1);
                 AUDIO_BOTTLE_PICKUP.play();
                 collectedBottles = collectedBottles + 1;
@@ -171,6 +187,38 @@ function checkCollisionBottles() {
         }
     }
 }
+
+function checkCollisionBoss() {
+
+    if ((boss_x - 60) < (character_x - bg_elem_1_x) && (boss_x + 220) > (character_x - bg_elem_1_x)) { //collision boss-player: check x direction
+        if (!timeoutInvincible) {
+            character_energy = character_energy - DAMAGE_ONE_HIT;
+            invincibilityAfterDamage();
+        }
+    }
+    if ((thrownBottle_x - 40) < boss_x && (thrownBottle_x + 180) > boss_x) { // collision boss-thrown bottle: check x direction
+        console.log('hitX');
+
+    }
+}
+
+function checkCollisionTacos() {
+    for (let i = 0; i < tacos.length; i++) {
+        let powerup = tacos[i];
+        
+        if ((powerup.tacoposition_x + bg_elem_1_x - 100) < character_x && (powerup.tacoposition_x + bg_elem_1_x + 20) > character_x) { //check x direction
+            if ((powerup.tacoposition_y - 240 - 20) < character_y && (powerup.tacoposition_y +20 ) > character_y) {
+                character_energy = character_energy + TACO_HEALTH_POTION;
+                if (character_energy > 100){
+                    character_energy = 100;
+                }
+                tacos.splice(i, 1);
+                AUDIO_TACO_PICKUP.play();
+            }
+        }
+    }
+}
+
 
 /**
  * invincibilityAfterDamage: creates a timeframe of invincibilty after taking damage
@@ -191,19 +239,22 @@ function draw() {
     updateCharacter();
     drawChicken();
     drawItemBottles();
+    drawItemTacos();
     requestAnimationFrame(draw);
     drawEnergybar();
     drawStatusbar();
+    drawThrowBottle();
+    drawBoss();
 }
 
 /**
  * drawStatusbar(): displays collected items
  */
 function drawStatusbar() {
-ctx.font = '20px Impact' //text amount
-ctx.fillStyle = 'white';
-ctx.fillText('x ' + collectedBottles, 50, 50);
-let bottleicon = new Image(); //icon bottle
+    ctx.font = '20px Impact' //text amount
+    ctx.fillStyle = 'white';
+    ctx.fillText('x ' + collectedBottles, 50, 50);
+    let bottleicon = new Image(); //icon bottle
     bottleicon.src = './img/items/Bottle_Tabasco/1_bottle_straight.png';
     if (bottleicon.complete) {
         ctx.drawImage(bottleicon, 0, 0, bottleicon.width * 0.17, bottleicon.height * 0.17);
@@ -247,6 +298,16 @@ function drawEnergybar() {
     ctx.fillStyle = "red"; //energybar
     ctx.fillRect(505, 15, 2 * character_energy, 20);
     ctx.globalAlpha = 1;
+}
+
+function ThrowBottle() {
+    let timePassed = new Date().getTime() - bottleThrowTime;
+    if (timePassed > 800) {
+        collectedBottles--;
+        bottleThrowTime = new Date().getTime();
+        drawThrowBottle();
+        AUDIO_BOTTLE_THROW.play();
+    }
 }
 
 //------------Objects-------------------------
@@ -344,7 +405,6 @@ function calcuteCloudOffset() {
 /**
  * drawItemBottle: draws bottles on canvas
  */
-
 function drawItemBottles() {
     for (i = 0; i < placedBottles.length; i++) {
         let bottle_x = placedBottles[i];
@@ -352,6 +412,32 @@ function drawItemBottles() {
     }
 }
 
+/**
+ * drawThrowBottle():displays thrown bottles
+ */
+function drawThrowBottle() {
+    if (bottleThrowTime) {  //checks if bottleThrowTime is defined, which is with every throw
+        let timePassed = new Date().getTime() - bottleThrowTime;
+        let gravityAdded = Math.pow(GRAVITY, timePassed / 200);
+        thrownBottle_x = 180 + (timePassed * 0.6);
+        thrownBottle_y = character_y + 100 - (timePassed * 0.4 - gravityAdded);
+        let image = new Image(); //icon bottle
+        image.src = './img/items/Bottle_Tabasco/1_bottle_straight.png';
+        if (image.complete) {
+            ctx.drawImage(image, thrownBottle_x, thrownBottle_y, image.width * 0.25, image.height * 0.25);
+        }
+    }
+}
+
+function drawItemTacos() {
+
+    for (i = 0; i < tacos.length; i++) {
+        let position_x = tacos[i].tacoposition_x + bg_elem_1_x;
+        let position_y = tacos[i].tacoposition_y;
+        let scale = tacos[i].tacoscale;
+        addBackgroundObject('./img/items/Taco_HealthPotion/taco-placeholder.png', position_x, position_y, scale);
+    }
+}
 //-------------Enemies--------------------------------------------------
 
 /**
@@ -403,20 +489,25 @@ function createChicken(type, position_x, speed) {
     };
 }
 
-
+function drawBoss() {
+    boss_x = 500;
+    addBackgroundObject('./img/enemies/chicken_boss/2_alert/G10.png', bg_elem_1_x + boss_x, 60, 0.3);
+}
 
 //------movement------------------------------------------------------
 
 /**
- *listenForKeys: enable and distribute movement
+ *listenForKeys: enable and distribute keys to movement
  */
 
 function listenForKeys() {
+
     document.addEventListener("keydown", e => {
         const k = e.key;
         // if (handler.hasOwnProperty(k)) {
         //     handler[k](k);
         // }
+        //console.log(k); //log keydowns in realtime
         if (k == 'ArrowRight') {
             //    character_x = character_x + 5;
             isMovingRight = true;
@@ -434,6 +525,10 @@ function listenForKeys() {
 
         }
         else { isJumping = false; } // TEST JUMPING /////////////////////////////////////////
+
+        if (k == 'd' && collectedBottles > 0) {
+            ThrowBottle();
+        }
     });
 
     document.addEventListener("keyup", e => {
