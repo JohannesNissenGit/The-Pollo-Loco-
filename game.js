@@ -43,6 +43,8 @@ AUDIO_JUMPING.volume = 0.6;
 let AUDIO_LOOP = new Audio('./sounds/mariachi.mp3');
 AUDIO_LOOP.loop = true;
 AUDIO_LOOP.volume = 0.1;
+
+
 //---------------------functions-----------------------------------------
 
 /**
@@ -58,7 +60,9 @@ function init() {
     draw();
     calcuteCloudOffset();
     calculateChickenPosition();
+    checkForCollision();
     listenForKeys();
+
 }
 
 /**
@@ -95,7 +99,7 @@ function checkForRunning() {
 
 function checkForJumping() {
     setInterval(function () {
-            if (isJumping == true && PlayerLastDirection == 'right') {
+        if (isJumping == true && PlayerLastDirection == 'right') {
             let index = characterGraphicsJumpingIndex % characterJumpingGraphicsRight.length;
             currentCharacterImage = characterJumpingGraphicsRight[index];
             characterGraphicsJumpingIndex = characterGraphicsJumpingIndex + 1;
@@ -106,6 +110,17 @@ function checkForJumping() {
             characterGraphicsJumpingIndex = characterGraphicsJumpingIndex + 1;
         }
     }, 50);
+}
+
+function checkForCollision() {
+    setInterval(function () {
+        for (let i = 0; i < chickens.length; i++) {
+            let chicken = chickens[i];
+            if ((chicken.position_x - 70) < character_x && (chicken.position_x + 70) > character_x) {
+                console.log('collision');
+            }
+        }
+    }, 50)
 }
 
 /**
