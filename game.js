@@ -12,10 +12,14 @@ let isMovingLeft = false;
 let lastJumpStarted = 0;
 let isFalling = false;
 let isJumping = false;
+PlayerLastDirection = 'right';
 let currentCharacterImage = 'img/character-1.png';
 let characterRunningGraphicsRight = ['./img/character/02_WALK/W-21.png', './img/character/02_WALK/W-22.png', './img/character/02_WALK/W-23.png', './img/character/02_WALK/W-24.png', './img/character/02_WALK/W-25.png', './img/character/02_WALK/W-26.png'];
 let characterRunningGraphicsLeft = ['./img/character/02_WALK/W-L-21.png', './img/character/02_WALK/W-L-22.png', './img/character/02_WALK/W-L-23.png', './img/character/02_WALK/W-L-24.png', './img/character/02_WALK/W-L-25.png', './img/character/02_WALK/W-L-26.png'];
+let characterJumpingGraphicsRight = ['./img/character/03_JUMP/J-34.png', './img/character/03_JUMP/J-34.png', './img/character/03_JUMP/J-35.png', './img/character/03_JUMP/J-35.png', './img/character/03_JUMP/J-36.png', './img/character/03_JUMP/J-36.png', './img/character/03_JUMP/J-37.png', './img/character/03_JUMP/J-37.png', './img/character/03_JUMP/J-37.png', './img/character/03_JUMP/J-37.png', './img/character/03_JUMP/J-37.png', './img/character/03_JUMP/J-37.png'];
+let characterJumpingGraphicsLeft = [];
 let characterGraphicsIndex = 0;
+let characterGraphicsJumpingIndex = 0;
 
 //background
 let bg_elem_1_x = 0;
@@ -47,9 +51,10 @@ AUDIO_LOOP.volume = 0.1;
 function init() {
     canvas = document.getElementById('canvas');
     ctx = canvas.getContext("2d");
-    StartMusic();
+    //StartMusic();
     createEnemyList();
     checkForRunning();
+    checkForJumping();
     draw();
     calcuteCloudOffset();
     calculateChickenPosition();
@@ -60,7 +65,7 @@ function init() {
  * StartMusic: starts playing the music theme for the level
  */
 async function StartMusic() {
-AUDIO_LOOP.play();
+    AUDIO_LOOP.play();
 }
 
 /**
@@ -68,24 +73,39 @@ AUDIO_LOOP.play();
  */
 function checkForRunning() {
     setInterval(function () {
-        let timePassedSinceJump = new Date().getTime() - lastJumpStarted;
-        //if ()
-            if (isMovingRight) {
-                AUDIO_RUNNING.play();
-                let index = characterGraphicsIndex % characterRunningGraphicsRight.length;
-                currentCharacterImage = characterRunningGraphicsRight[index];
-                characterGraphicsIndex = characterGraphicsIndex + 1;
-            }
-        if (isMovingLeft) {
+        if (isMovingRight && !isJumping) {
+            AUDIO_RUNNING.play();
+            let index = characterGraphicsIndex % characterRunningGraphicsRight.length;
+            currentCharacterImage = characterRunningGraphicsRight[index];
+            characterGraphicsIndex = characterGraphicsIndex + 1;
+            PlayerLastDirection = 'right';
+        }
+        if (isMovingLeft && !isJumping) {
             AUDIO_RUNNING.play();
             let index = characterGraphicsIndex % characterRunningGraphicsLeft.length;
             currentCharacterImage = characterRunningGraphicsLeft[index];
             characterGraphicsIndex = characterGraphicsIndex + 1;
+            PlayerLastDirection = 'left';
         }
-        if(!isMovingLeft && !isMovingRight) {
+        if (!isMovingLeft && !isMovingRight) {
             AUDIO_RUNNING.pause();
         }
     }, 60);
+}
+
+function checkForJumping() {
+    setInterval(function () {
+            if (isJumping == true && PlayerLastDirection == 'right') {
+            let index = characterGraphicsJumpingIndex % characterJumpingGraphicsRight.length;
+            currentCharacterImage = characterJumpingGraphicsRight[index];
+            characterGraphicsJumpingIndex = characterGraphicsJumpingIndex + 1;
+        }
+        if (isJumping == true && PlayerLastDirection == 'left') {
+            let index = characterGraphicsJumpingIndex % characterJumpingGraphicsLeft.length;
+            currentCharacterImage = characterJumpingGraphicsLeft[index];
+            characterGraphicsJumpingIndex = characterGraphicsJumpingIndex + 1;
+        }
+    }, 50);
 }
 
 /**
@@ -111,13 +131,18 @@ function updateCharacter() {
 
     let timePassedSinceJump = new Date().getTime() - lastJumpStarted;
     if (timePassedSinceJump < JUMP_TIME_UP) {
+        isJumping = true;
         character_y = character_y - 14;
+        characterGraphicsJumpingIndex = 0;
     } else {
-        if (character_y < 110) {
-            character_y = character_y + 7;
 
+        if (character_y < 110) {
+            isJumping = true;
+            character_y = character_y + 7;
         }
+        else { isJumping = false; }
     }
+
 
     if (base_image.complete) {
         ctx.drawImage(base_image, character_x, character_y, base_image.width * 0.25, base_image.height * 0.25);
@@ -195,7 +220,7 @@ function drawBackgrounds() {
     }
 
     for (k = 0; k < 6; k++) {
-        addBackgroundObject('./img/background/01_nearBG/completo.png', bg_elem_1_x + k * 960, 110, 0.25);    //nearest background layer
+        addBackgroundObject('./img/background/01_nearBG/completo.png', bg_elem_1_x + k * 960, -30, 0.45);    //nearest background layer
     }
 }
 
@@ -291,10 +316,10 @@ function listenForKeys() {
 
         let timePassedSinceJump = new Date().getTime() - lastJumpStarted;
 
-        if (e.code == 'Space' && timePassedSinceJump > WHOLE_JUMP_TIME) { 
+        if (e.code == 'Space' && timePassedSinceJump > WHOLE_JUMP_TIME) {
             lastJumpStarted = new Date().getTime();
             AUDIO_JUMPING.play();
-            isJumping = true;       // TEST JUMPING /////////////////////////////////////////
+
         }
         else { isJumping = false; } // TEST JUMPING /////////////////////////////////////////
     });
