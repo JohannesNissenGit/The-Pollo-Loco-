@@ -13,6 +13,7 @@ let isMovingLeft = false;
 let lastJumpStarted = 0;
 let isFalling = false;
 let isJumping = false;
+let timeoutInvincible = false;
 PlayerLastDirection = 'right';
 let currentCharacterImage = 'img/character-1.png';
 let characterRunningGraphicsRight = ['./img/character/02_WALK/W-21.png', './img/character/02_WALK/W-22.png', './img/character/02_WALK/W-23.png', './img/character/02_WALK/W-24.png', './img/character/02_WALK/W-25.png', './img/character/02_WALK/W-26.png'];
@@ -23,8 +24,8 @@ let characterGraphicsIndex = 0;
 let characterGraphicsJumpingIndex = 0;
 
 //background
-let bg_elem_1_x = 0;
-let bg_elem_2_x = 0;
+let bg_elem_1_x = 0; //foreground x, counters "walking" speed of player 
+let bg_elem_2_x = 0; 
 let bg_elem_3_x = 0;
 let cloudoffset = 0;
 
@@ -34,9 +35,15 @@ let enemy_small_x = 0;
 
 
 //-------------------constants-----------------------------------------
-let GAME_SPEED = 5;
+let GAME_SPEED = 5; //variable to control speed of game
 let JUMP_TIME_UP = 270; //240
 let WHOLE_JUMP_TIME = JUMP_TIME_UP + JUMP_TIME_UP * 1.9;
+let COLLISION_DETECT_OFFSET_Y = 215;    //bridges offset in y direction between character and small enemies
+let INVINCIBILITY_DURATION_AFTER_HIT = 800; //disables damage after being hit
+let DAMAGE_ONE_HIT = 20; //damage received for one hit by regular enemy
+
+let LEVEL_WALL_START = -5; //invisible wall on (left) start side of level
+let LEVEL_WALL_FINISH = -2500; //invisible wall on (right) end side of level, increases with negatively
 let AUDIO_RUNNING = new Audio('./sounds/cartoon_running.mp3');
 AUDIO_RUNNING.volume = 0.9;
 let AUDIO_JUMPING = new Audio('./sounds/cartoon_jump.mp3');
@@ -47,6 +54,14 @@ AUDIO_LOOP.volume = 0.1;
 
 
 //---------------------functions-----------------------------------------
+
+
+/**
+ * StartMusic: starts playing the music theme for the level
+ */
+async function StartMusic() {
+    AUDIO_LOOP.play();
+}
 
 /**
  * initialise display
@@ -66,12 +81,6 @@ function init() {
 
 }
 
-/**
- * StartMusic: starts playing the music theme for the level
- */
-async function StartMusic() {
-    AUDIO_LOOP.play();
-}
 
 /**
  * checks if player is moving and changes animation
@@ -98,6 +107,9 @@ function checkForRunning() {
     }, 60);
 }
 
+/**
+ * checkForJumping(): checks for jump condition and displays jumping animation 
+ */
 function checkForJumping() {
     setInterval(function () {
         if (isJumping == true && PlayerLastDirection == 'right') {
@@ -113,16 +125,38 @@ function checkForJumping() {
     }, 50);
 }
 
+/**
+ * checkForCollision(): checks if character is in collision radius with enemies and distributes damage if applicable
+ */
 function checkForCollision() {
     setInterval(function () {
         for (let i = 0; i < chickens.length; i++) {
-            let chicken = chickens[i];
-            if ((chicken.position_x - 80) < character_x && (chicken.position_x + 20) > character_x) {
-                console.log('collision'); 
-                character_energy = character_energy - 20;
+            let enemy = chickens[i];
+            //let enemy_x_absolute = enemy.position_x + bg_elem_1_x;
+            if ((enemy.position_x - 80) < character_x && (enemy.position_x + 20) > character_x) { //check x direction
+               // if ((enemy_x_absolute - 10) < character_x && (enemy_x_absolute + 10) > character_x) { //proposition of Junus, not working
+               //console.log('collisionX');   
+               if ((enemy.position_y - COLLISION_DETECT_OFFSET_Y - 20) < character_y && (enemy.position_y - COLLISION_DETECT_OFFSET_Y + 20) > character_y) {
+                console.log('collisionY'); 
+                if (!timeoutInvincible){
+                character_energy = character_energy - DAMAGE_ONE_HIT;
+                invincibilityAfterDamage();
+            }
+               }
             }
         }
     }, 50)
+}
+
+/**
+ * invincibilityAfterDamage: creates a timeframe of invincibilty after taking damage
+ */
+function invincibilityAfterDamage() {
+    timeoutInvincible = true;
+    setTimeout( function() {
+        timeoutInvincible = false;
+    }, INVINCIBILITY_DURATION_AFTER_HIT);
+
 }
 
 /**
@@ -200,7 +234,7 @@ function drawGround() {
     //ctx.fillStyle = '#FFE699';  //old ground layer
     //ctx.fillRect(0, 375, canvas.width, canvas.height - 375);
     addBackgroundObject('./img/background/06_Ground.png', 0, 320, 0.4);  //ground layer
-    if (isMovingRight) {
+    if (isMovingRight && bg_elem_1_x > LEVEL_WALL_FINISH)  { //&& bg_elem_1_x < LEVEL_WALL_FINISH)
         bg_elem_1_x = bg_elem_1_x - GAME_SPEED;
         bg_elem_2_x = bg_elem_2_x - (0.5 * GAME_SPEED);
         bg_elem_3_x = bg_elem_3_x - (0.35 * GAME_SPEED);
@@ -209,7 +243,7 @@ function drawGround() {
         }
     }
 
-    if (isMovingLeft) {
+    if (isMovingLeft && bg_elem_1_x < LEVEL_WALL_START) {
         bg_elem_1_x = bg_elem_1_x + GAME_SPEED;
         bg_elem_2_x = bg_elem_2_x + (0.4 * GAME_SPEED);
         bg_elem_3_x = bg_elem_3_x + (0.25 * GAME_SPEED);
@@ -241,11 +275,11 @@ function drawBackgrounds() {
         addBackgroundObject('./img/background/03_farBG/Completo.png', bg_elem_3_x + i * 1726, -110, 0.45);  //far away background layer
     }
 
-    for (j = 0; j < 4; j++) {
+    for (j = 0; j < 6; j++) {
         addBackgroundObject('./img/background/02_middleBG/completo.png', bg_elem_2_x + j * 1050, 70, 0.28);  //middle distanced background layer
     }
 
-    for (k = 0; k < 6; k++) {
+    for (k = 0; k < 10; k++) {
         addBackgroundObject('./img/background/01_nearBG/completo.png', bg_elem_1_x + k * 960, -30, 0.45);    //nearest background layer
     }
 }
@@ -254,7 +288,9 @@ function drawBackgrounds() {
  * drawclouds: adds cloud objects
  */
 function drawclouds() {
-    addBackgroundObject('img/background/04_clouds/Completo.png', 100 - cloudoffset, -60, 0.5);
+    addBackgroundObject('./img/background/04_clouds/Completo.png', 100 - cloudoffset, -60, 0.5);
+    addBackgroundObject('./img/background/04_clouds/1.png', 1000 - cloudoffset, -60, 0.5);
+    addBackgroundObject('./img/background/04_clouds/2.png', 1200 - cloudoffset, -60, 0.6);
 }
 
 /**
@@ -275,8 +311,9 @@ function calcuteCloudOffset() {
 function createEnemyList() {
     chickens = [
         createChicken('brown', bg_elem_1_x + 600, 2),
-        createChicken('yellow', bg_elem_1_x + 800, 4),
-        createChicken('yellow', bg_elem_1_x + 1000, (Math.random() * 5))
+        createChicken('yellow', bg_elem_1_x + 900, 3),
+        createChicken('yellow', bg_elem_1_x + 1000, (Math.random() * 5)),
+        createChicken('brown', bg_elem_1_x + 1200, 2),
     ]
 }
 
