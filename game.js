@@ -25,7 +25,7 @@ let characterGraphicsJumpingIndex = 0;
 
 //background
 let bg_elem_1_x = 0; //foreground x, counters "walking" speed of player 
-let bg_elem_2_x = 0; 
+let bg_elem_2_x = 0;
 let bg_elem_3_x = 0;
 let cloudoffset = 0;
 
@@ -33,6 +33,9 @@ let cloudoffset = 0;
 let chickens = [];
 let enemy_small_x = 0;
 
+//items
+let placedBottles = [400, 1700, 2450];
+let collectedBottles = 0;
 
 //-------------------constants-----------------------------------------
 let GAME_SPEED = 5; //variable to control speed of game
@@ -44,6 +47,8 @@ let DAMAGE_ONE_HIT = 20; //damage received for one hit by regular enemy
 
 let LEVEL_WALL_START = -5; //invisible wall on (left) start side of level
 let LEVEL_WALL_FINISH = -2500; //invisible wall on (right) end side of level, increases with negatively
+
+//--------------------sounds----------------------------------------
 let AUDIO_RUNNING = new Audio('./sounds/cartoon_running.mp3');
 AUDIO_RUNNING.volume = 0.9;
 let AUDIO_JUMPING = new Audio('./sounds/cartoon_jump.mp3');
@@ -51,7 +56,8 @@ AUDIO_JUMPING.volume = 0.6;
 let AUDIO_LOOP = new Audio('./sounds/mariachi.mp3');
 AUDIO_LOOP.loop = true;
 AUDIO_LOOP.volume = 0.1;
-
+let AUDIO_BOTTLE_PICKUP = new Audio('./sounds/powerup_2.mp3');
+AUDIO_BOTTLE_PICKUP.volume = 0.6;
 
 //---------------------functions-----------------------------------------
 
@@ -130,22 +136,40 @@ function checkForJumping() {
  */
 function checkForCollision() {
     setInterval(function () {
-        for (let i = 0; i < chickens.length; i++) {
-            let enemy = chickens[i];
-            //let enemy_x_absolute = enemy.position_x + bg_elem_1_x;
-            if ((enemy.position_x - 80) < character_x && (enemy.position_x + 20) > character_x) { //check x direction
-               // if ((enemy_x_absolute - 10) < character_x && (enemy_x_absolute + 10) > character_x) { //proposition of Junus, not working
-               //console.log('collisionX');   
-               if ((enemy.position_y - COLLISION_DETECT_OFFSET_Y - 20) < character_y && (enemy.position_y - COLLISION_DETECT_OFFSET_Y + 20) > character_y) {
-                console.log('collisionY'); 
-                if (!timeoutInvincible){
-                character_energy = character_energy - DAMAGE_ONE_HIT;
-                invincibilityAfterDamage();
-            }
-               }
+        checkCollisionSmallEnemies();
+        checkCollisionBottles();
+    }, 50)
+}
+
+function checkCollisionSmallEnemies() {
+    for (let i = 0; i < chickens.length; i++) {
+        let enemy = chickens[i];
+        //let enemy_x_absolute = enemy.position_x + bg_elem_1_x;
+        if ((enemy.position_x - 80) < character_x && (enemy.position_x + 20) > character_x) { //check x direction
+            // if ((enemy_x_absolute - 10) < character_x && (enemy_x_absolute + 10) > character_x) { //proposition of Junus, not working
+            //console.log('collisionX');   
+            if ((enemy.position_y - COLLISION_DETECT_OFFSET_Y - 20) < character_y && (enemy.position_y - COLLISION_DETECT_OFFSET_Y + 20) > character_y) {
+                if (!timeoutInvincible) {
+                    character_energy = character_energy - DAMAGE_ONE_HIT;
+                    invincibilityAfterDamage();
+                }
             }
         }
-    }, 50)
+    }
+}
+
+function checkCollisionBottles() {
+    for (let i = 0; i < placedBottles.length; i++) {
+        let object_x = placedBottles[i];
+        if ((object_x - 30) < (character_x -bg_elem_1_x) && (object_x + 30) > (character_x - bg_elem_1_x)) { //check x direction 
+            
+            if (character_y > 100) {              
+                placedBottles.splice(i, 1);
+                AUDIO_BOTTLE_PICKUP.play();
+                collectedBottles = collectedBottles + 1;
+            }
+        }
+    }
 }
 
 /**
@@ -153,7 +177,7 @@ function checkForCollision() {
  */
 function invincibilityAfterDamage() {
     timeoutInvincible = true;
-    setTimeout( function() {
+    setTimeout(function () {
         timeoutInvincible = false;
     }, INVINCIBILITY_DURATION_AFTER_HIT);
 
@@ -166,10 +190,25 @@ function draw() {
     drawBackground();
     updateCharacter();
     drawChicken();
+    drawItemBottles();
     requestAnimationFrame(draw);
     drawEnergybar();
+    drawStatusbar();
 }
 
+/**
+ * drawStatusbar(): displays collected items
+ */
+function drawStatusbar() {
+ctx.font = '20px Impact' //text amount
+ctx.fillStyle = 'white';
+ctx.fillText('x ' + collectedBottles, 50, 50);
+let bottleicon = new Image(); //icon bottle
+    bottleicon.src = './img/items/Bottle_Tabasco/1_bottle_straight.png';
+    if (bottleicon.complete) {
+        ctx.drawImage(bottleicon, 0, 0, bottleicon.width * 0.17, bottleicon.height * 0.17);
+    }
+}
 
 //---------player model--------------------
 
@@ -204,9 +243,9 @@ function updateCharacter() {
 function drawEnergybar() {
     ctx.globalAlpha = 0.9;
     ctx.fillStyle = "white"; //frame energybar
-    ctx.fillRect(500,10,210,30);
+    ctx.fillRect(500, 10, 210, 30);
     ctx.fillStyle = "red"; //energybar
-    ctx.fillRect(505,15,2* character_energy,20);
+    ctx.fillRect(505, 15, 2 * character_energy, 20);
     ctx.globalAlpha = 1;
 }
 
@@ -234,7 +273,7 @@ function drawGround() {
     //ctx.fillStyle = '#FFE699';  //old ground layer
     //ctx.fillRect(0, 375, canvas.width, canvas.height - 375);
     addBackgroundObject('./img/background/06_Ground.png', 0, 320, 0.4);  //ground layer
-    if (isMovingRight && bg_elem_1_x > LEVEL_WALL_FINISH)  { //&& bg_elem_1_x < LEVEL_WALL_FINISH)
+    if (isMovingRight && bg_elem_1_x > LEVEL_WALL_FINISH) { //&& bg_elem_1_x < LEVEL_WALL_FINISH)
         bg_elem_1_x = bg_elem_1_x - GAME_SPEED;
         bg_elem_2_x = bg_elem_2_x - (0.5 * GAME_SPEED);
         bg_elem_3_x = bg_elem_3_x - (0.35 * GAME_SPEED);
@@ -302,6 +341,16 @@ function calcuteCloudOffset() {
     }, 50)
 }
 
+/**
+ * drawItemBottle: draws bottles on canvas
+ */
+
+function drawItemBottles() {
+    for (i = 0; i < placedBottles.length; i++) {
+        let bottle_x = placedBottles[i];
+        addBackgroundObject('./img/items/Bottle_Tabasco/2_bottle_buried1.png', bg_elem_1_x + bottle_x, 310, 0.25);
+    }
+}
 
 //-------------Enemies--------------------------------------------------
 
