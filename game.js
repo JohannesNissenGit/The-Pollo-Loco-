@@ -7,6 +7,7 @@ let ctx;
 //character
 let character_x = 130;
 let character_y = 110;
+let character_energy = 100;
 let isMovingRight = false;
 let isMovingLeft = false;
 let lastJumpStarted = 0;
@@ -116,8 +117,9 @@ function checkForCollision() {
     setInterval(function () {
         for (let i = 0; i < chickens.length; i++) {
             let chicken = chickens[i];
-            if ((chicken.position_x - 70) < character_x && (chicken.position_x + 70) > character_x) {
-                console.log('collision');
+            if ((chicken.position_x - 80) < character_x && (chicken.position_x + 20) > character_x) {
+                console.log('collision'); 
+                character_energy = character_energy - 20;
             }
         }
     }, 50)
@@ -131,6 +133,7 @@ function draw() {
     updateCharacter();
     drawChicken();
     requestAnimationFrame(draw);
+    drawEnergybar();
 }
 
 
@@ -164,6 +167,14 @@ function updateCharacter() {
     };
 }
 
+function drawEnergybar() {
+    ctx.globalAlpha = 0.9;
+    ctx.fillStyle = "white"; //frame energybar
+    ctx.fillRect(500,10,210,30);
+    ctx.fillStyle = "red"; //energybar
+    ctx.fillRect(505,15,2* character_energy,20);
+    ctx.globalAlpha = 1;
+}
 
 //------------Objects-------------------------
 
