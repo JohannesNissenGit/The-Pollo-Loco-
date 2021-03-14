@@ -370,15 +370,20 @@ function BossinvincibilityAfterDamage() {
  */
 function draw() {
     drawBackground();
-    updateCharacter();
-    drawChicken();
-    drawItemBottles();
-    drawItemTacos();
-    requestAnimationFrame(draw);
-    drawEnergybar();
-    drawStatusbar();
-    drawThrowBottle();
-    drawBoss();
+    if (gamewin) {
+        console.log('win');
+        setTimeout(function () { drawEndScreen(); }, 300)  //go to gameover.js
+    } else {
+        updateCharacter();
+        drawChicken();
+        drawItemBottles();
+        drawItemTacos();
+        requestAnimationFrame(draw);
+        drawEnergybar();
+        drawStatusbar();
+        drawThrowBottle();
+        drawBoss();
+    }
 }
 
 /**
