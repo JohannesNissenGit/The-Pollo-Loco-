@@ -32,6 +32,10 @@ let cloudoffset = 0;
 //enemies
 let chickens = [];
 let enemy_small_x = 0;
+let boss_position_x = 600;
+let boss_health = 100;
+let boss_defeated_at = 0;
+let bosstimeoutInvincible = false;
 
 //items
 let placedBottles = [200, 600, 990, 1700, 2450];
@@ -47,11 +51,13 @@ let tacos = [
 //-------------------constants-----------------------------------------
 let GAME_SPEED = 5; //variable to control speed of game
 let GRAVITY = 7;    //gravity downwards pull for thrown objects
-let JUMP_TIME_UP = 270; //240
-let WHOLE_JUMP_TIME = JUMP_TIME_UP + JUMP_TIME_UP * 1.9;
+let JUMP_TIME_UP = 270; //240 //time moving up while jumping
+let WHOLE_JUMP_TIME = JUMP_TIME_UP + JUMP_TIME_UP * 1.9; //duration of whole jump 
 let COLLISION_DETECT_OFFSET_Y = 215;    //bridges offset in y direction between character and small enemies
-let INVINCIBILITY_DURATION_AFTER_HIT = 800; //disables damage after being hit
+let INVINCIBILITY_DURATION_AFTER_HIT = 800; //disables damage for a certain time in ms after being hit
+let BOSS_INVINCIBILITY_DURATION_AFTER_HIT = 500; //disables damage to boss for a certain time in ms after hit by player
 let DAMAGE_ONE_HIT = 20; //damage received for one hit by regular enemy
+let DAMAGE_BOSS_ONE_HIT = 25; //damage received for one hit by boss
 
 let LEVEL_WALL_START = -5; //invisible wall on (left) start side of level
 let LEVEL_WALL_FINISH = -2500; //invisible wall on (right) end side of level, increases with negatively
@@ -68,11 +74,14 @@ AUDIO_LOOP.loop = true;
 AUDIO_LOOP.volume = 0.1;
 let AUDIO_BOTTLE_PICKUP = new Audio('./sounds/powerup_2.mp3');
 AUDIO_BOTTLE_PICKUP.volume = 0.6;
-let AUDIO_BOTTLE_THROW = new Audio('./sounds/bottle_throw_short.mp3')
+let AUDIO_BOTTLE_THROW = new Audio('./sounds/bottle_throw_short.mp3');
 AUDIO_BOTTLE_THROW.volume = 0.6;
-let AUDIO_TACO_PICKUP = new Audio('./sounds/powerup_1.mp3')
+let AUDIO_TACO_PICKUP = new Audio('./sounds/powerup_1.mp3');
 AUDIO_TACO_PICKUP.volume = 0.6;
-
+let PLAYER_DAMAGE_HIT= new Audio('./sounds/character_damage_uu.mp3');
+PLAYER_DAMAGE_HIT.volume = 0.4;
+let BOSS_DAMAGE_HIT = new Audio('./sounds/damage_punch.mp3');
+BOSS_DAMAGE_HIT.volume = 0.6;
 //---------------------functions-----------------------------------------
 
 
@@ -168,6 +177,7 @@ function checkCollisionSmallEnemies() {
                 if (!timeoutInvincible) {
                     character_energy = character_energy - DAMAGE_ONE_HIT;
                     invincibilityAfterDamage();
+                    PLAYER_DAMAGE_HIT.play();
                 }
             }
         }
@@ -192,24 +202,30 @@ function checkCollisionBoss() {
 
     if ((boss_x - 60) < (character_x - bg_elem_1_x) && (boss_x + 220) > (character_x - bg_elem_1_x)) { //collision boss-player: check x direction
         if (!timeoutInvincible) {
-            character_energy = character_energy - DAMAGE_ONE_HIT;
+            character_energy = character_energy - DAMAGE_BOSS_ONE_HIT;
             invincibilityAfterDamage();
+            PLAYER_DAMAGE_HIT.play();
         }
     }
     if ((thrownBottle_x - 40) < boss_x && (thrownBottle_x + 180) > boss_x) { // collision boss-thrown bottle: check x direction
         console.log('hitX');
-
+        if (!bosstimeoutInvincible) {
+            boss_health = boss_health - 25;
+            BossinvincibilityAfterDamage();
+            console.log(boss_health);
+            BOSS_DAMAGE_HIT.play();
+        }
     }
 }
 
 function checkCollisionTacos() {
     for (let i = 0; i < tacos.length; i++) {
         let powerup = tacos[i];
-        
+
         if ((powerup.tacoposition_x + bg_elem_1_x - 100) < character_x && (powerup.tacoposition_x + bg_elem_1_x + 20) > character_x) { //check x direction
-            if ((powerup.tacoposition_y - 240 - 20) < character_y && (powerup.tacoposition_y +20 ) > character_y) {
+            if ((powerup.tacoposition_y - 240 - 20) < character_y && (powerup.tacoposition_y + 20) > character_y) {
                 character_energy = character_energy + TACO_HEALTH_POTION;
-                if (character_energy > 100){
+                if (character_energy > 100) {
                     character_energy = 100;
                 }
                 tacos.splice(i, 1);
@@ -229,6 +245,13 @@ function invincibilityAfterDamage() {
         timeoutInvincible = false;
     }, INVINCIBILITY_DURATION_AFTER_HIT);
 
+}
+
+function BossinvincibilityAfterDamage() {
+    bosstimeoutInvincible = true;
+    setTimeout(function () {
+        bosstimeoutInvincible = false;
+    }, BOSS_INVINCIBILITY_DURATION_AFTER_HIT);
 }
 
 /**
@@ -490,8 +513,18 @@ function createChicken(type, position_x, speed) {
 }
 
 function drawBoss() {
-    boss_x = 500;
+    boss_x = boss_position_x;
     addBackgroundObject('./img/enemies/chicken_boss/2_alert/G10.png', bg_elem_1_x + boss_x, 60, 0.3);
+    //boss health bar
+    if (boss_health > 0) {
+        ctx.globalAlpha = 0.8;
+        ctx.fillStyle = "white"; //frame boss energybar
+        ctx.fillRect(bg_elem_1_x + boss_x - 5, 75, 140, 20);
+        ctx.fillStyle = "red"; // boss energybar
+        ctx.fillRect(bg_elem_1_x + boss_x, 80, 1.3 * boss_health, 10);
+        ctx.globalAlpha = 1;
+    }
+
 }
 
 //------movement------------------------------------------------------
