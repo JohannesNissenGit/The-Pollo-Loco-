@@ -256,13 +256,13 @@ function checkCollisionSmallEnemies() {
 function checkCollisionBottleSmallEnemies() {
     for (let i = 0; i < chickens.length; i++) {
         let enemy = chickens[i];
-        
+
         if ((enemy.position_x - 20) < thrownBottle_x && (enemy.position_x + 30) > thrownBottle_x) { //check x direction
             //console.log('enemyX');
             //console.log(thrownBottle_y);
-           if (thrownBottle_y >250 && thrownBottle_y < 500) { // enemy.posiion.y0=325 for small enemies on ground level
-               // console.log('enemyYY');
-                enemy.defeated = true;               
+            if (thrownBottle_y > 250 && thrownBottle_y < 500) { // enemy.posiion.y0=325 for small enemies on ground level
+                console.log('enemyYY');
+                enemy.defeated = true;
             }
         }
     }
@@ -607,11 +607,12 @@ function drawChicken() {
     for (i = 0; i < chickens.length; i++) {
         let enemy = chickens[i];
         //if (enemy.defeated = false) {
-        addBackgroundObject(enemy.img, enemy.position_x, enemy.position_y, enemy.scale);}
-        //else {
-        //   console.log('dead');
-        //    addBackgroundObject(enemy.imgdefeated, enemy.position_x, enemy.position_y, enemy.scale);
-        //}
+        addBackgroundObject(enemy.img, enemy.position_x, enemy.position_y, enemy.scale);
+    }
+    //else {
+    //   console.log('dead');
+    //    addBackgroundObject(enemy.imgdefeated, enemy.position_x, enemy.position_y, enemy.scale);
+    //}
     //}
 }
 
