@@ -4,6 +4,12 @@
 let canvas;
 let ctx;
 
+//general game
+let gameover = false;
+let gamewin = false;
+let coinsCollected = false;
+let bossDefeated = false;
+
 //character
 let character_x = 130;
 let character_y = 110;
@@ -14,7 +20,7 @@ let lastJumpStarted = 0;
 let isFalling = false;
 let isJumping = false;
 let timeoutInvincible = false;
-PlayerLastDirection = 'right';
+let PlayerLastDirection = 'right';
 let currentCharacterImage = 'img/character-1.png';
 let characterRunningGraphicsRight = ['./img/character/02_WALK/W-21.png', './img/character/02_WALK/W-22.png', './img/character/02_WALK/W-23.png', './img/character/02_WALK/W-24.png', './img/character/02_WALK/W-25.png', './img/character/02_WALK/W-26.png'];
 let characterRunningGraphicsLeft = ['./img/character/02_WALK/W-L-21.png', './img/character/02_WALK/W-L-22.png', './img/character/02_WALK/W-L-23.png', './img/character/02_WALK/W-L-24.png', './img/character/02_WALK/W-L-25.png', './img/character/02_WALK/W-L-26.png'];
@@ -32,7 +38,19 @@ let cloudoffset = 0;
 //enemies
 let chickens = [];
 let enemy_small_x = 0;
-let boss_position_x = 600;
+let currentSmallEnemyimage;
+let SmallEnemyWalkingGraphics = [];
+let SmallEnemyWalkingGraphicsIndex = 0;
+let SmallEnemyDefeatedGraphics = [];
+let SmallEnemyDefeatedGraphicsIndex = 0;
+let currentBossImage;
+let bossWalkingGraphics = ['./img/enemies/chicken_boss/1_walk/G1.png', './img/enemies/chicken_boss/1_walk/G2.png', './img/enemies/chicken_boss/1_walk/G3.png', './img/enemies/chicken_boss/1_walk/G4.png'];
+let bossWalkingGraphicsIndex = 0;
+let bossDefeatedGraphics = ['./img/enemies/chicken_boss/5_dead/G23.png', './img/enemies/chicken_boss/5_dead/G23.png', './img/enemies/chicken_boss/5_dead/G24.png', './img/enemies/chicken_boss/5_dead/G24.png', './img/enemies/chicken_boss/5_dead/G25.png', './img/enemies/chicken_boss/5_dead/G25.png', './img/enemies/chicken_boss/5_dead/G26.png', './img/enemies/chicken_boss/5_dead/G26.png'];
+let bossDefeatedGraphicsIndex = 0;
+let boss_position_x = 1200; //place where endboss is waiting
+let boss_x;
+let boxx_y;
 let boss_health = 100;
 let boss_defeated_at = 0;
 let bosstimeoutInvincible = false;
@@ -47,6 +65,7 @@ let tacos = [
     { "tacoposition_x": 500, "tacoposition_y": 350, "tacoscale": 0.1 },
     { "tacoposition_x": 900, "tacoposition_y": 350, "tacoscale": 0.1 }
 ];
+
 
 //-------------------constants-----------------------------------------
 let GAME_SPEED = 5; //variable to control speed of game
@@ -63,6 +82,7 @@ let LEVEL_WALL_START = -5; //invisible wall on (left) start side of level
 let LEVEL_WALL_FINISH = -2500; //invisible wall on (right) end side of level, increases with negatively
 
 let TACO_HEALTH_POTION = 40; //amount of health gained by picking up taco powerup
+
 
 //--------------------sounds----------------------------------------
 let AUDIO_RUNNING = new Audio('./sounds/cartoon_running.mp3');
@@ -82,6 +102,11 @@ let PLAYER_DAMAGE_HIT = new Audio('./sounds/character_damage_uu.mp3');
 PLAYER_DAMAGE_HIT.volume = 0.4;
 let BOSS_DAMAGE_HIT = new Audio('./sounds/glass_broken.mp3');
 BOSS_DAMAGE_HIT.volume = 0.6;
+
+
+
+
+
 //---------------------functions-----------------------------------------
 
 
@@ -99,9 +124,12 @@ function init() {
     canvas = document.getElementById('canvas');
     ctx = canvas.getContext("2d");
     StartMusic();
+    checkForGameEnd();
     createEnemyList();
     checkForRunning();
     checkForJumping();
+    checkEnemyAnimation();
+    checkBossAnimation();
     draw();
     calcuteCloudOffset();
     calculateChickenPosition();
@@ -153,6 +181,46 @@ function checkForJumping() {
         }
     }, 50);
 }
+/**
+ * checkEnemyAnimation(): iterates enemy walking and dying animation
+ */
+function checkEnemyAnimation() {
+    setInterval(function () {
+        for (i = 0; i < chickens.length; i++) {
+            if (chickens[i].defeated = false) { //if alive
+                let index = SmallEnemyWalkingGraphicsIndex % SmallEnemyWalkingGraphics.length;
+                currentSmallEnemyimage = SmallEnemyWalkingGraphics[index];
+                SmallEnemyWalkingGraphicsIndex = SmallEnemyWalkingGraphicsIndex + 1;
+            }
+            if (chickens[i].defeated = true) { //if defeated
+                let index = SmallEnemyDefeatedGraphicsIndex % SmallEnemyDefeatedGraphics.length;
+                currentSmallEnemyimage = SmallEnemyDefeatedGraphics[index];
+                SmallEnemyDefeatedGraphicsIndex = SmallEnemyDefeatedGraphicsIndex + 1;
+            }
+        }
+    }, 90);
+}
+
+/**
+ * checkBossAnimation(): checks if boss is defeated and changes animation
+ */
+function checkBossAnimation() {
+    if (boss_health > 0 && !bossDefeated) {
+        setInterval(function () {
+            let index = bossWalkingGraphicsIndex % bossWalkingGraphics.length;
+            currentBossImage = bossWalkingGraphics[index];
+            bossWalkingGraphicsIndex = bossWalkingGraphicsIndex + 1;
+        }, 70);
+    }
+    else if (bossDefeated) {
+        setInterval(function () {
+            let index = BossDefeatedGraphicsIndex;
+            currentBossImage = bossDyingGraphics[index];
+            let BossDefeatedGraphicsIndex = BossDefeatedGraphicsIndex + 1;
+        }, 100);
+    }
+}
+
 
 /**
  * checkForCollision(): checks if character is in collision radius with relevant objects
@@ -160,6 +228,7 @@ function checkForJumping() {
 function checkForCollision() {
     setInterval(function () {
         checkCollisionSmallEnemies();
+        checkCollisionBottleSmallEnemies();
         checkCollisionBottles();
         checkCollisionTacos();
         checkCollisionBoss();
@@ -184,6 +253,21 @@ function checkCollisionSmallEnemies() {
     }
 }
 
+function checkCollisionBottleSmallEnemies() {
+    for (let i = 0; i < chickens.length; i++) {
+        let enemy = chickens[i];
+        
+        if ((enemy.position_x - 20) < thrownBottle_x && (enemy.position_x + 30) > thrownBottle_x) { //check x direction
+            //console.log('enemyX');
+            //console.log(thrownBottle_y);
+           if (thrownBottle_y >250 && thrownBottle_y < 500) { // enemy.posiion.y0=325 for small enemies on ground level
+               // console.log('enemyYY');
+                enemy.defeated = true;               
+            }
+        }
+    }
+}
+
 function checkCollisionBottles() {
     for (let i = 0; i < placedBottles.length; i++) {
         let object_x = placedBottles[i];
@@ -199,23 +283,29 @@ function checkCollisionBottles() {
 }
 
 function checkCollisionBoss() {
-
-    if ((boss_x - 60) < (character_x - bg_elem_1_x) && (boss_x + 220) > (character_x - bg_elem_1_x)) { //collision boss-player: check x direction
-        if (!timeoutInvincible) {
-            character_energy = character_energy - DAMAGE_BOSS_ONE_HIT;
-            invincibilityAfterDamage();
-            PLAYER_DAMAGE_HIT.play();
+    if (!bossDefeated) {
+        //if ((boss_x - 60) < (character_x - bg_elem_1_x) && (boss_x + 220) > (character_x - bg_elem_1_x)) { //old
+        if ((boss_x - 55) < (character_x) && (boss_x + 210) > (character_x)) { //collision boss-player: check x direction
+            if (!timeoutInvincible && boss_health > 0) {
+                character_energy = character_energy - DAMAGE_BOSS_ONE_HIT;
+                invincibilityAfterDamage();
+                PLAYER_DAMAGE_HIT.play();
+            }
         }
-    }
-    if ((thrownBottle_x - bg_elem_1_x - 40) < boss_x && (thrownBottle_x - bg_elem_1_x + 40) > boss_x) { // collision boss-thrown bottle: check x direction
-        console.log(thrownBottle_x + 'hitX');
-        if (!bosstimeoutInvincible) {
-            BOSS_DAMAGE_HIT.play();
-            AUDIO_BOTTLE_THROW.pause();
-            AUDIO_BOTTLE_THROW.currentTime = 0;
-            boss_health = boss_health - 25;
-            BossinvincibilityAfterDamage();
-            console.log(boss_health);
+        //if ((thrownBottle_x - bg_elem_1_x - 40) < boss_x && (thrownBottle_x - bg_elem_1_x + 40) > boss_x && thrownBottle_x!=0) { // old
+        if ((thrownBottle_x - 80) < boss_x && (thrownBottle_x + 20) > boss_x && thrownBottle_x != 0 && thrownBottle_y < 320) { // collision boss-thrown bottle: check x direction 
+            console.log(thrownBottle_x + 'hitX');
+            if (!bosstimeoutInvincible && boss_health > 0) {
+                BOSS_DAMAGE_HIT.play();
+                AUDIO_BOTTLE_THROW.pause();
+                AUDIO_BOTTLE_THROW.currentTime = 0;
+                boss_health = boss_health - 25;
+                BossinvincibilityAfterDamage();
+            }
+            if (boss_health <= 0) {
+                bossDefeated = true;
+                boss_defeated_at = new Date().getTime();
+            }
         }
     }
 }
@@ -239,6 +329,23 @@ function checkCollisionTacos() {
 
 
 /**
+ * checks for winning or losing condition
+ */
+function checkForGameEnd() {
+    setInterval(function () {
+        if (character_energy <= 0) {
+            gameover = true;
+        }
+        if (boss_health <= 0) {
+            gamewin = true;
+        }
+        if (coinsCollected) {
+            gamewin = true;
+        }
+    }, 50);
+}
+
+/**
  * invincibilityAfterDamage: creates a timeframe of invincibilty after taking damage
  */
 function invincibilityAfterDamage() {
@@ -255,6 +362,8 @@ function BossinvincibilityAfterDamage() {
         bosstimeoutInvincible = false;
     }, BOSS_INVINCIBILITY_DURATION_AFTER_HIT);
 }
+
+
 
 /**
  * draw visible elements
@@ -447,6 +556,7 @@ function drawThrowBottle() {
         let gravityAdded = Math.pow(GRAVITY, timePassed / 200);
         thrownBottle_x = 180 + (timePassed * 0.6);
         thrownBottle_y = character_y + 100 - (timePassed * 0.4 - gravityAdded);
+        //thrownBottle_y = character_y +190 ; //test for straight throw
         let image = new Image(); //icon bottle
         image.src = './img/items/Bottle_Tabasco/1_bottle_straight.png';
         if (image.complete) {
@@ -496,8 +606,13 @@ function calculateChickenPosition() {
 function drawChicken() {
     for (i = 0; i < chickens.length; i++) {
         let enemy = chickens[i];
-        addBackgroundObject(enemy.img, enemy.position_x, enemy.position_y, enemy.scale);
-    }
+        //if (enemy.defeated = false) {
+        addBackgroundObject(enemy.img, enemy.position_x, enemy.position_y, enemy.scale);}
+        //else {
+        //   console.log('dead');
+        //    addBackgroundObject(enemy.imgdefeated, enemy.position_x, enemy.position_y, enemy.scale);
+        //}
+    //}
 }
 
 /**
@@ -511,26 +626,42 @@ function createChicken(type, position_x, speed) {
         "position_x": position_x,
         "position_y": 325,
         "scale": 0.32,
-        "speed": speed
+        "speed": speed,
+        "defeated": false
     };
 }
 
 function drawBoss() {
-    boss_x = boss_position_x;
-    addBackgroundObject('./img/enemies/chicken_boss/2_alert/G10.png', bg_elem_1_x + boss_x, 60, 0.3);
-    //boss health bar
-    if (boss_health > 0) {
-        ctx.globalAlpha = 0.8;
-        ctx.fillStyle = "white"; //frame boss energybar
-        ctx.fillRect(bg_elem_1_x + boss_x - 5, 75, 140, 20);
-        ctx.fillStyle = "red"; // boss energybar
-        ctx.fillRect(bg_elem_1_x + boss_x, 80, 1.3 * boss_health, 10);
-        ctx.globalAlpha = 1;
-    }
+    boss_x = boss_position_x + bg_elem_1_x;
 
+    if (boss_defeated_at > 0) {
+        let timePassed = new Date().getTime() - boss_defeated_at;
+        if (timePassed < 800) {
+            boss_x = boss_x + timePassed * 0.3;
+            let gravityAdded = Math.pow(GRAVITY, timePassed / 200);
+            boss_y = 60 - (timePassed * 0.2 - gravityAdded);
+            addBackgroundObject(currentBossImage, boss_x, boss_y, 0.3);
+        }
+
+    }
+    else {
+        addBackgroundObject(currentBossImage, boss_x, 60, 0.3);
+        //addBackgroundObject('./img/enemies/chicken_boss/2_alert/G10.png', boss_x, 60, 0.3);
+        //boss health bar
+        if (boss_health > 0) {
+            ctx.globalAlpha = 0.8;
+            ctx.fillStyle = "white"; //frame boss energybar
+            ctx.fillRect(boss_x - 5, 75, 140, 20);
+            ctx.fillStyle = "red"; // boss energybar
+            ctx.fillRect(boss_x, 80, 1.3 * boss_health, 10);
+            ctx.globalAlpha = 1;
+        }
+    }
 }
 
-//------movement------------------------------------------------------
+
+
+//------keys for movement------------------------------------------------------
 
 /**
  *listenForKeys: enable and distribute keys to movement
