@@ -62,8 +62,8 @@ let bottleThrowTime = 0;
 let thrownBottle_x = 0; //x position of thrown object
 let thrownBottle_y = 0;
 let tacos = [
-    { "tacoposition_x": 500, "tacoposition_y": 350, "tacoscale": 0.1 },
-    { "tacoposition_x": 900, "tacoposition_y": 350, "tacoscale": 0.1 }
+    { "tacoposition_x": 500, "tacoposition_y": 340, "tacoscale": 0.15 },
+    { "tacoposition_x": 900, "tacoposition_y": 340, "tacoscale": 0.15 }
 ];
 
 
@@ -576,7 +576,7 @@ function drawItemTacos() {
         let position_x = tacos[i].tacoposition_x + bg_elem_1_x;
         let position_y = tacos[i].tacoposition_y;
         let scale = tacos[i].tacoscale;
-        addBackgroundObject('./img/items/Taco_HealthPotion/taco-placeholder.png', position_x, position_y, scale);
+        addBackgroundObject('./img/items/Taco_HealthPotion/taco_johannes.png', position_x, position_y, scale);
     }
 }
 //-------------Enemies--------------------------------------------------
