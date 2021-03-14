@@ -18,7 +18,7 @@ PlayerLastDirection = 'right';
 let currentCharacterImage = 'img/character-1.png';
 let characterRunningGraphicsRight = ['./img/character/02_WALK/W-21.png', './img/character/02_WALK/W-22.png', './img/character/02_WALK/W-23.png', './img/character/02_WALK/W-24.png', './img/character/02_WALK/W-25.png', './img/character/02_WALK/W-26.png'];
 let characterRunningGraphicsLeft = ['./img/character/02_WALK/W-L-21.png', './img/character/02_WALK/W-L-22.png', './img/character/02_WALK/W-L-23.png', './img/character/02_WALK/W-L-24.png', './img/character/02_WALK/W-L-25.png', './img/character/02_WALK/W-L-26.png'];
-let characterJumpingGraphicsRight = ['./img/character/03_JUMP/J-34.png', './img/character/03_JUMP/J-34.png', './img/character/03_JUMP/J-35.png', './img/character/03_JUMP/J-35.png', './img/character/03_JUMP/J-36.png', './img/character/03_JUMP/J-36.png', './img/character/03_JUMP/J-37.png', './img/character/03_JUMP/J-37.png', './img/character/03_JUMP/J-37.png', './img/character/03_JUMP/J-37.png', './img/character/03_JUMP/J-37.png', './img/character/03_JUMP/J-37.png'];
+let characterJumpingGraphicsRight = ['./img/character/03_JUMP/J-34.png', './img/character/03_JUMP/J-34.png', './img/character/03_JUMP/J-35.png', './img/character/03_JUMP/J-35.png', './img/character/03_JUMP/J-36.png', './img/character/03_JUMP/J-36.png', './img/character/03_JUMP/J-37.png', './img/character/03_JUMP/J-37.png', './img/character/03_JUMP/J-37.png', './img/character/03_JUMP/J-37.png', './img/character/03_JUMP/J-37.png', './img/character/01_IDLE/IDLE/I-1.png'];
 let characterJumpingGraphicsLeft = [];
 let characterGraphicsIndex = 0;
 let characterGraphicsJumpingIndex = 0;
@@ -54,7 +54,7 @@ let GRAVITY = 7;    //gravity downwards pull for thrown objects
 let JUMP_TIME_UP = 270; //240 //time moving up while jumping
 let WHOLE_JUMP_TIME = JUMP_TIME_UP + JUMP_TIME_UP * 1.9; //duration of whole jump 
 let COLLISION_DETECT_OFFSET_Y = 215;    //bridges offset in y direction between character and small enemies
-let INVINCIBILITY_DURATION_AFTER_HIT = 800; //disables damage for a certain time in ms after being hit
+let INVINCIBILITY_DURATION_AFTER_HIT = 900; //disables damage for a certain time in ms after being hit
 let BOSS_INVINCIBILITY_DURATION_AFTER_HIT = 500; //disables damage to boss for a certain time in ms after hit by player
 let DAMAGE_ONE_HIT = 20; //damage received for one hit by regular enemy
 let DAMAGE_BOSS_ONE_HIT = 25; //damage received for one hit by boss
@@ -78,9 +78,9 @@ let AUDIO_BOTTLE_THROW = new Audio('./sounds/bottle_throw_short.mp3');
 AUDIO_BOTTLE_THROW.volume = 0.6;
 let AUDIO_TACO_PICKUP = new Audio('./sounds/powerup_1.mp3');
 AUDIO_TACO_PICKUP.volume = 0.6;
-let PLAYER_DAMAGE_HIT= new Audio('./sounds/character_damage_uu.mp3');
+let PLAYER_DAMAGE_HIT = new Audio('./sounds/character_damage_uu.mp3');
 PLAYER_DAMAGE_HIT.volume = 0.4;
-let BOSS_DAMAGE_HIT = new Audio('./sounds/damage_punch.mp3');
+let BOSS_DAMAGE_HIT = new Audio('./sounds/glass_broken.mp3');
 BOSS_DAMAGE_HIT.volume = 0.6;
 //---------------------functions-----------------------------------------
 
@@ -98,7 +98,7 @@ async function StartMusic() {
 function init() {
     canvas = document.getElementById('canvas');
     ctx = canvas.getContext("2d");
-    //StartMusic();
+    StartMusic();
     createEnemyList();
     checkForRunning();
     checkForJumping();
@@ -207,13 +207,15 @@ function checkCollisionBoss() {
             PLAYER_DAMAGE_HIT.play();
         }
     }
-    if ((thrownBottle_x - 40) < boss_x && (thrownBottle_x + 180) > boss_x) { // collision boss-thrown bottle: check x direction
-        console.log('hitX');
+    if ((thrownBottle_x - bg_elem_1_x - 40) < boss_x && (thrownBottle_x - bg_elem_1_x + 40) > boss_x) { // collision boss-thrown bottle: check x direction
+        console.log(thrownBottle_x + 'hitX');
         if (!bosstimeoutInvincible) {
+            BOSS_DAMAGE_HIT.play();
+            AUDIO_BOTTLE_THROW.pause();
+            AUDIO_BOTTLE_THROW.currentTime = 0;
             boss_health = boss_health - 25;
             BossinvincibilityAfterDamage();
             console.log(boss_health);
-            BOSS_DAMAGE_HIT.play();
         }
     }
 }
@@ -326,10 +328,11 @@ function drawEnergybar() {
 function ThrowBottle() {
     let timePassed = new Date().getTime() - bottleThrowTime;
     if (timePassed > 800) {
+        AUDIO_BOTTLE_THROW.play()
         collectedBottles--;
         bottleThrowTime = new Date().getTime();
         drawThrowBottle();
-        AUDIO_BOTTLE_THROW.play();
+
     }
 }
 
