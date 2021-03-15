@@ -5,10 +5,18 @@
 <script src="game.js"></script>
 <script src="gameover.js"></script>
 <script src="titlescreen.js"></script>
+<script src="startscreen.js"></script>
 
 </head>
-<body onload="init()">
-    <h2>EL POLLO LOCO</h2>
+<body onload="initstartscreen()"> 
+    <!--button after gameover-->
+    <div id="tryagainbutton" class="btn-tryagain d-none zminus10" ><p><a href="index.html"> BACK TO MAIN MENU</a></p></div>
+
+    <!--button at game start-->
+    <div id="startbutton" class="btn-start" onclick="startnewgame()"><p> START NEW GAME</p></div>
+     
+    <!--header-->
+    <h2 class="header1">EL POLLO LOCO</h2>
 
     <!--Canvas game screen-->
 <canvas id="canvas" width="720" height="480">

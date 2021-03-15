@@ -38,9 +38,15 @@ let cloudoffset = 0;
 //enemies
 let chickens = [];
 let enemy_small_x = 0;
-let currentSmallEnemyimage;
-let SmallEnemyWalkingGraphics = [];
-let SmallEnemyWalkingGraphicsIndex = 0;
+
+let currentSmallYellowEnemyimage;
+let SmallEnemyYellowWalkingGraphics = ['./img/enemies/chicken_yellow/1_walk.png', './img/enemies/chicken_yellow/2_walk.png', './img/enemies/chicken_yellow/3_walk.png'];
+let SmallEnemyYellowWalkingGraphicsIndex = 0;
+
+let currentSmallBrownEnemyimage;
+let SmallEnemyBrownWalkingGraphics = ['./img/enemies/chicken_brown/1_walk.png', './img/enemies/chicken_brown/2_walk.png', './img/enemies/chicken_brown/3_walk.png'];
+let SmallEnemyBrownWalkingGraphicsIndex = 0;
+
 let SmallEnemyDefeatedGraphics = [];
 let SmallEnemyDefeatedGraphicsIndex = 0;
 let currentBossImage;
@@ -61,6 +67,9 @@ let collectedBottles = 50;
 let bottleThrowTime = 0;
 let thrownBottle_x = 0; //x position of thrown object
 let thrownBottle_y = 0;
+let thrownbottleCurrentImage;
+let thrownbottleGraphics = ['./img/items/Bottle_Tabasco/rotation/rotate1_0.png', './img/items/Bottle_Tabasco/rotation/rotate2_90.png', './img/items/Bottle_Tabasco/rotation/rotate3_180.png', './img/items/Bottle_Tabasco/rotation/rotate4_270.png'];
+let thrownbottleGraphicsIndex = 0;
 let tacos = [
     { "tacoposition_x": 500, "tacoposition_y": 340, "tacoscale": 0.15 },
     { "tacoposition_x": 900, "tacoposition_y": 340, "tacoscale": 0.15 }
@@ -99,11 +108,11 @@ AUDIO_BOTTLE_THROW.volume = 0.6;
 let AUDIO_TACO_PICKUP = new Audio('./sounds/powerup_1.mp3');
 AUDIO_TACO_PICKUP.volume = 0.6;
 let PLAYER_DAMAGE_HIT = new Audio('./sounds/character_damage_uu.mp3');
-PLAYER_DAMAGE_HIT.volume = 0.4;
+PLAYER_DAMAGE_HIT.volume = 0.7;
 let BOSS_DAMAGE_HIT = new Audio('./sounds/glass_broken.mp3');
 BOSS_DAMAGE_HIT.volume = 0.6;
-
-
+let AUDIO_BOSS_DEFEATED = new Audio('./sounds/Level_complete_1.mp3');
+AUDIO_BOSS_DEFEATED.volume = 0.9;
 
 
 
@@ -128,8 +137,10 @@ function init() {
     createEnemyList();
     checkForRunning();
     checkForJumping();
-    checkEnemyAnimation();
+    checkYellowEnemyAnimation();
+    checkBrownEnemyAnimation();
     checkBossAnimation();
+    checkBottleAnimation();
     draw();
     calcuteCloudOffset();
     calculateChickenPosition();
@@ -138,6 +149,23 @@ function init() {
 
 }
 
+/**
+ * checks for winning or losing condition
+ */
+function checkForGameEnd() {
+    setInterval(function () {
+        if (character_energy <= 0) {
+            gameover = true;
+        }
+        //if (boss_health <= 0) {
+            if (bossDefeated){
+            gamewin = true;
+        }
+        if (coinsCollected) {
+            gamewin = true;
+        }
+    }, 50);
+}
 
 /**
  * checks if player is moving and changes animation
@@ -184,23 +212,33 @@ function checkForJumping() {
 /**
  * checkEnemyAnimation(): iterates enemy walking and dying animation
  */
-function checkEnemyAnimation() {
+function checkYellowEnemyAnimation() {
     setInterval(function () {
         for (i = 0; i < chickens.length; i++) {
-            if (chickens[i].defeated = false) { //if alive
-                let index = SmallEnemyWalkingGraphicsIndex % SmallEnemyWalkingGraphics.length;
-                currentSmallEnemyimage = SmallEnemyWalkingGraphics[index];
-                SmallEnemyWalkingGraphicsIndex = SmallEnemyWalkingGraphicsIndex + 1;
-            }
-            if (chickens[i].defeated = true) { //if defeated
-                let index = SmallEnemyDefeatedGraphicsIndex % SmallEnemyDefeatedGraphics.length;
-                currentSmallEnemyimage = SmallEnemyDefeatedGraphics[index];
-                SmallEnemyDefeatedGraphicsIndex = SmallEnemyDefeatedGraphicsIndex + 1;
-            }
+            // if (chickens[i].defeated = false) { //if alive
+            let index = SmallEnemyYellowWalkingGraphicsIndex % SmallEnemyYellowWalkingGraphics.length;
+            currentSmallYellowEnemyimage = SmallEnemyYellowWalkingGraphics[index];
+            SmallEnemyYellowWalkingGraphicsIndex = SmallEnemyYellowWalkingGraphicsIndex + 1;
+            // }
+            //if (chickens[i].defeated = true) { //if defeated
+            //    let index = SmallEnemyDefeatedGraphicsIndex % SmallEnemyDefeatedGraphics.length;
+            //    currentSmallEnemyimage = SmallEnemyDefeatedGraphics[index];
+            //    SmallEnemyDefeatedGraphicsIndex = SmallEnemyDefeatedGraphicsIndex + 1;
+            // }
         }
-    }, 90);
+    }, 150);
 }
 
+function checkBrownEnemyAnimation() {
+    setInterval(function () {
+        for (i = 0; i < chickens.length; i++) {
+            // if (chickens[i].defeated = false) { //if alive
+            let index = SmallEnemyBrownWalkingGraphicsIndex % SmallEnemyBrownWalkingGraphics.length;
+            currentSmallBrownEnemyimage = SmallEnemyBrownWalkingGraphics[index];
+            SmallEnemyBrownWalkingGraphicsIndex = SmallEnemyBrownWalkingGraphicsIndex + 1;
+        }
+    }, 150);
+}
 /**
  * checkBossAnimation(): checks if boss is defeated and changes animation
  */
@@ -210,7 +248,7 @@ function checkBossAnimation() {
             let index = bossWalkingGraphicsIndex % bossWalkingGraphics.length;
             currentBossImage = bossWalkingGraphics[index];
             bossWalkingGraphicsIndex = bossWalkingGraphicsIndex + 1;
-        }, 70);
+        }, 100);
     }
     else if (bossDefeated) {
         setInterval(function () {
@@ -221,6 +259,16 @@ function checkBossAnimation() {
     }
 }
 
+/**
+ * checkBottleAnimation(): changes bottle throw animation
+ */
+function checkBottleAnimation() {
+    setInterval(function () {
+        let index = thrownbottleGraphicsIndex % thrownbottleGraphics.length;
+        thrownbottleCurrentImage = thrownbottleGraphics[index];
+        thrownbottleGraphicsIndex = thrownbottleGraphicsIndex + 1;
+    }, 70);
+}
 
 /**
  * checkForCollision(): checks if character is in collision radius with relevant objects
@@ -303,8 +351,13 @@ function checkCollisionBoss() {
                 BossinvincibilityAfterDamage();
             }
             if (boss_health <= 0) {
-                bossDefeated = true;
                 boss_defeated_at = new Date().getTime();
+                AUDIO_LOOP.pause();
+                AUDIO_BOSS_DEFEATED.play();
+                setInterval ( function() {
+                bossDefeated = true;
+                }, 1000);
+                
             }
         }
     }
@@ -327,23 +380,6 @@ function checkCollisionTacos() {
     }
 }
 
-
-/**
- * checks for winning or losing condition
- */
-function checkForGameEnd() {
-    setInterval(function () {
-        if (character_energy <= 0) {
-            gameover = true;
-        }
-        if (boss_health <= 0) {
-            gamewin = true;
-        }
-        if (coinsCollected) {
-            gamewin = true;
-        }
-    }, 50);
-}
 
 /**
  * invincibilityAfterDamage: creates a timeframe of invincibilty after taking damage
@@ -563,7 +599,8 @@ function drawThrowBottle() {
         thrownBottle_y = character_y + 100 - (timePassed * 0.4 - gravityAdded);
         //thrownBottle_y = character_y +190 ; //test for straight throw
         let image = new Image(); //icon bottle
-        image.src = './img/items/Bottle_Tabasco/1_bottle_straight.png';
+        //image.src = './img/items/Bottle_Tabasco/1_bottle_straight.png';
+        image.src = thrownbottleCurrentImage;
         if (image.complete) {
             ctx.drawImage(image, thrownBottle_x, thrownBottle_y, image.width * 0.25, image.height * 0.25);
         }
@@ -612,13 +649,19 @@ function drawChicken() {
     for (i = 0; i < chickens.length; i++) {
         let enemy = chickens[i];
         //if (enemy.defeated = false) {
-        addBackgroundObject(enemy.img, enemy.position_x, enemy.position_y, enemy.scale);
+        //addBackgroundObject(enemy.img, enemy.position_x, enemy.position_y, enemy.scale);
+        if (enemy.type == 'yellow')
+            addBackgroundObject(currentSmallYellowEnemyimage, enemy.position_x, enemy.position_y, enemy.scale);
+
+        //else {
+        //   console.log('dead');
+        //    addBackgroundObject(enemy.imgdefeated, enemy.position_x, enemy.position_y, enemy.scale);
+        //}
+        //}
+        if (enemy.type == 'brown') {
+            addBackgroundObject(currentSmallBrownEnemyimage, enemy.position_x, enemy.position_y, enemy.scale);
+        }
     }
-    //else {
-    //   console.log('dead');
-    //    addBackgroundObject(enemy.imgdefeated, enemy.position_x, enemy.position_y, enemy.scale);
-    //}
-    //}
 }
 
 /**
@@ -628,7 +671,8 @@ function drawChicken() {
  */
 function createChicken(type, position_x, speed) {
     return {
-        "img": "./img/enemies/chicken_" + type + "/1_walk.png",
+        //"img": "./img/enemies/chicken_" + type + "/1_walk.png",
+        "type": type,
         "position_x": position_x,
         "position_y": 325,
         "scale": 0.32,
