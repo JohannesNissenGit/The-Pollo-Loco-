@@ -17,6 +17,11 @@ body {
     display: none;
 }
 
+.header1 {
+    margin-top: 20px;
+    margin-left: 240px;
+}
+
 
 /*try again button*/
 .btn-tryagain {

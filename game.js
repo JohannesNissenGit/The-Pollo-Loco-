@@ -63,7 +63,7 @@ let bosstimeoutInvincible = false;
 
 //items
 let placedBottles = [200, 600, 990, 1700, 2450];
-let collectedBottles = 50;
+let collectedBottles = 4;
 let bottleThrowTime = 0;
 let thrownBottle_x = 0; //x position of thrown object
 let thrownBottle_y = 0;
@@ -215,12 +215,12 @@ function checkForJumping() {
 function checkYellowEnemyAnimation() {
     setInterval(function () {
         for (i = 0; i < chickens.length; i++) {
-            // if (chickens[i].defeated = false) { //if alive
+            // if (chickens[i].defeated == false) { //if alive
             let index = SmallEnemyYellowWalkingGraphicsIndex % SmallEnemyYellowWalkingGraphics.length;
             currentSmallYellowEnemyimage = SmallEnemyYellowWalkingGraphics[index];
             SmallEnemyYellowWalkingGraphicsIndex = SmallEnemyYellowWalkingGraphicsIndex + 1;
             // }
-            //if (chickens[i].defeated = true) { //if defeated
+            //if (chickens[i].defeated == true) { //if defeated
             //    let index = SmallEnemyDefeatedGraphicsIndex % SmallEnemyDefeatedGraphics.length;
             //    currentSmallEnemyimage = SmallEnemyDefeatedGraphics[index];
             //    SmallEnemyDefeatedGraphicsIndex = SmallEnemyDefeatedGraphicsIndex + 1;
@@ -232,7 +232,7 @@ function checkYellowEnemyAnimation() {
 function checkBrownEnemyAnimation() {
     setInterval(function () {
         for (i = 0; i < chickens.length; i++) {
-            // if (chickens[i].defeated = false) { //if alive
+            // if (chickens[i].defeated == false) { //if alive
             let index = SmallEnemyBrownWalkingGraphicsIndex % SmallEnemyBrownWalkingGraphics.length;
             currentSmallBrownEnemyimage = SmallEnemyBrownWalkingGraphics[index];
             SmallEnemyBrownWalkingGraphicsIndex = SmallEnemyBrownWalkingGraphicsIndex + 1;
@@ -309,7 +309,7 @@ function checkCollisionBottleSmallEnemies() {
             //console.log('enemyX');
             //console.log(thrownBottle_y);
             if (thrownBottle_y > 250 && thrownBottle_y < 500) { // enemy.posiion.y0=325 for small enemies on ground level
-                console.log('enemyYY');
+                console.log('HitSmallEnemyYY');
                 enemy.defeated = true;
             }
         }
