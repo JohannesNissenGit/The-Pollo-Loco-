@@ -52,9 +52,9 @@ let SmallEnemyDefeatedGraphicsIndex = 0;
 let currentBossImage;
 let bossWalkingGraphics = ['./img/enemies/chicken_boss/1_walk/G1.png', './img/enemies/chicken_boss/1_walk/G2.png', './img/enemies/chicken_boss/1_walk/G3.png', './img/enemies/chicken_boss/1_walk/G4.png'];
 let bossWalkingGraphicsIndex = 0;
-let bossDefeatedGraphics = ['./img/enemies/chicken_boss/5_dead/G23.png', './img/enemies/chicken_boss/5_dead/G23.png', './img/enemies/chicken_boss/5_dead/G24.png', './img/enemies/chicken_boss/5_dead/G24.png', './img/enemies/chicken_boss/5_dead/G25.png', './img/enemies/chicken_boss/5_dead/G25.png', './img/enemies/chicken_boss/5_dead/G26.png', './img/enemies/chicken_boss/5_dead/G26.png'];
+let bossDefeatedGraphics = ['./img/enemies/chicken_boss/5_dead/G23.png', './img/enemies/chicken_boss/5_dead/G24.png', './img/enemies/chicken_boss/5_dead/G25.png', './img/enemies/chicken_boss/5_dead/G26.png'];
 let bossDefeatedGraphicsIndex = 0;
-let boss_position_x = 1200; //place where endboss is waiting
+let boss_position_x = 1500; //place where endboss is waiting
 let boss_x;
 let boxx_y;
 let boss_health = 100;
@@ -71,8 +71,8 @@ let thrownbottleCurrentImage;
 let thrownbottleGraphics = ['./img/items/Bottle_Tabasco/rotation/rotate1_0.png', './img/items/Bottle_Tabasco/rotation/rotate2_90.png', './img/items/Bottle_Tabasco/rotation/rotate3_180.png', './img/items/Bottle_Tabasco/rotation/rotate4_270.png'];
 let thrownbottleGraphicsIndex = 0;
 let tacos = [
-    { "tacoposition_x": 500, "tacoposition_y": 340, "tacoscale": 0.15 },
-    { "tacoposition_x": 900, "tacoposition_y": 340, "tacoscale": 0.15 }
+    { "tacoposition_x": 800, "tacoposition_y": 340, "tacoscale": 0.15 },
+    { "tacoposition_x": 1100, "tacoposition_y": 340, "tacoscale": 0.15 }
 ];
 
 
@@ -158,8 +158,10 @@ function checkForGameEnd() {
             gameover = true;
         }
         //if (boss_health <= 0) {
-            if (bossDefeated){
-            gamewin = true;
+        if (bossDefeated) {
+            setInterval(function () {
+                gamewin = true;
+            }, 1000);
         }
         if (coinsCollected) {
             gamewin = true;
@@ -243,19 +245,21 @@ function checkBrownEnemyAnimation() {
  * checkBossAnimation(): checks if boss is defeated and changes animation
  */
 function checkBossAnimation() {
-    if (boss_health > 0 && !bossDefeated) {
+    //if (boss_health > 0) {
+    if (boss_defeated_at == 0) {
         setInterval(function () {
             let index = bossWalkingGraphicsIndex % bossWalkingGraphics.length;
             currentBossImage = bossWalkingGraphics[index];
             bossWalkingGraphicsIndex = bossWalkingGraphicsIndex + 1;
         }, 100);
     }
-    else if (bossDefeated) {
+    //if (boss_health <= 0) {
+    if (boss_defeated_at > 0) {
         setInterval(function () {
-            let index = BossDefeatedGraphicsIndex;
-            currentBossImage = bossDyingGraphics[index];
+            let index = BossDefeatedGraphicsIndex % BossDefeatedGraphics.length;
+            currentBossImage = BossDefeatedGraphics[index];
             let BossDefeatedGraphicsIndex = BossDefeatedGraphicsIndex + 1;
-        }, 100);
+        }, 200);
     }
 }
 
@@ -354,10 +358,8 @@ function checkCollisionBoss() {
                 boss_defeated_at = new Date().getTime();
                 AUDIO_LOOP.pause();
                 AUDIO_BOSS_DEFEATED.play();
-                setInterval ( function() {
                 bossDefeated = true;
-                }, 1000);
-                
+                console.log('bossdefeated');
             }
         }
     }
@@ -686,17 +688,17 @@ function drawBoss() {
 
     if (boss_defeated_at > 0) {
         let timePassed = new Date().getTime() - boss_defeated_at;
-        if (timePassed < 800) {
-            boss_x = boss_x + timePassed * 0.3;
-            let gravityAdded = Math.pow(GRAVITY, timePassed / 200);
-            boss_y = 60 - (timePassed * 0.2 - gravityAdded);
-            addBackgroundObject(currentBossImage, boss_x, boss_y, 0.3);
-        }
+        //if (timePassed < 800) {
+        boss_x = boss_x + timePassed * 0.3;
+        let gravityAdded = Math.pow(GRAVITY, timePassed / 200);
+        boss_y = 60 - (timePassed * 0.2 - gravityAdded);
+        addBackgroundObject(currentBossImage, boss_x, boss_y, 0.3);
+        //}
 
     }
     else {
         addBackgroundObject(currentBossImage, boss_x, 60, 0.3);
-        //addBackgroundObject('./img/enemies/chicken_boss/2_alert/G10.png', boss_x, 60, 0.3);
+
         //boss health bar
         if (boss_health > 0) {
             ctx.globalAlpha = 0.8;
