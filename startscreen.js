@@ -17,9 +17,16 @@ function initstartscreen() {
 }
 
 function startnewgame() {
-    document.getElementById('startbutton').classList.add('d-none');
-    document.getElementById('startbutton').classList.add('zminus10');
-    document.getElementById('startbutton').classList.remove('z10');
+    document.getElementById('buttoncotainer').classList.add('d-none');
+    document.getElementById('buttoncotainer').classList.add('zminus10');
+    document.getElementById('buttoncotainer').classList.remove('z10');
+    document.getElementById('helpbutton').classList.add('d-none');
+    document.getElementById('helpbutton').classList.add('zminus10');
+    document.getElementById('helpbutton').classList.remove('z10');
     init();
 
+}
+
+function openhelp() {
+    alert('under construction.');
 }

@@ -25,7 +25,7 @@ let currentCharacterImage = 'img/character-1.png';
 let characterRunningGraphicsRight = ['./img/character/02_WALK/W-21.png', './img/character/02_WALK/W-22.png', './img/character/02_WALK/W-23.png', './img/character/02_WALK/W-24.png', './img/character/02_WALK/W-25.png', './img/character/02_WALK/W-26.png'];
 let characterRunningGraphicsLeft = ['./img/character/02_WALK/W-L-21.png', './img/character/02_WALK/W-L-22.png', './img/character/02_WALK/W-L-23.png', './img/character/02_WALK/W-L-24.png', './img/character/02_WALK/W-L-25.png', './img/character/02_WALK/W-L-26.png'];
 let characterJumpingGraphicsRight = ['./img/character/03_JUMP/J-34.png', './img/character/03_JUMP/J-34.png', './img/character/03_JUMP/J-35.png', './img/character/03_JUMP/J-35.png', './img/character/03_JUMP/J-36.png', './img/character/03_JUMP/J-36.png', './img/character/03_JUMP/J-37.png', './img/character/03_JUMP/J-37.png', './img/character/03_JUMP/J-37.png', './img/character/03_JUMP/J-37.png', './img/character/03_JUMP/J-37.png', './img/character/01_IDLE/IDLE/I-1.png'];
-let characterJumpingGraphicsLeft = [];
+let characterJumpingGraphicsLeft = ['./img/character/03_JUMP/J-34.png', './img/character/03_JUMP/J-34.png', './img/character/03_JUMP/J-35.png', './img/character/03_JUMP/J-35.png', './img/character/03_JUMP/J-36.png', './img/character/03_JUMP/J-36.png', './img/character/03_JUMP/J-37.png', './img/character/03_JUMP/J-37.png', './img/character/03_JUMP/J-37.png', './img/character/03_JUMP/J-37.png', './img/character/03_JUMP/J-37.png', './img/character/01_IDLE/IDLE/I-1.png'];
 let characterGraphicsIndex = 0;
 let characterGraphicsJumpingIndex = 0;
 
@@ -745,7 +745,7 @@ function listenForKeys() {
         }
         else { isJumping = false; } // TEST JUMPING /////////////////////////////////////////
 
-        if (k == 'd' && collectedBottles > 0) {
+        if (k == 'b' && collectedBottles > 0) {
             ThrowBottle();
         }
     });
