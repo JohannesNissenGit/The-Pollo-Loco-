@@ -29,5 +29,13 @@ function startnewgame() {
 }
 
 function openhelp() {
-    alert('under construction.');
+    document.getElementById('helpcontainer').classList.remove('d-none');
+    document.getElementById('helpcontainer').classList.remove('zminus10');
+    document.getElementById('helpcontainer').classList.add('z10');
+}
+
+function closehelp() {
+    document.getElementById('helpcontainer').classList.add('d-none');
+    document.getElementById('helpcontainer').classList.add('zminus10');
+    document.getElementById('helpcontainer').classList.remove('z10');
 }

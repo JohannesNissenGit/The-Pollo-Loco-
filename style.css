@@ -45,6 +45,11 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    transition: transform .225s; /*Animation*/
+}
+
+.btn-tryagain:hover {
+    transform: scale(1.2); /*Animation*/
 }
 
 .btn-tryagain p {
@@ -57,6 +62,7 @@ body {
 }
 
 
+/*container, displayed at gamestart*/
 .buttoncotainer {
     margin-top: 300px;
     width:720px;
@@ -79,6 +85,11 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    transition: transform .225s; /*Animation*/
+}
+
+.btn-start:hover {
+    transform: scale(1.1); /*Animation*/
 }
 
 .btn-start p {
@@ -102,6 +113,11 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    transition: transform .225s; /*Animation*/
+}
+
+.btn-help:hover {
+    transform: scale(1.1); /*Animation*/
 }
 
 .btn-help p {
@@ -113,7 +129,29 @@ body {
     text-decoration: none;
 }
 
-/*bottom style*/
+/*Instructions*/
+
+.helpcontainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 745px;
+    height: 470px;
+    background-color: rgba(rgba(255, 239, 151, 0.616), green, blue, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.help-text {
+    padding: 25px;
+    width: 500px;
+    background-color: lightgrey;
+    border-radius: 15px;
+}
+
+
+/*bottom controls style*/
 
 .controls-container {
     padding-top: 20px;
@@ -144,3 +182,4 @@ body {
     justify-content: center;
     align-items: center;
 }
+

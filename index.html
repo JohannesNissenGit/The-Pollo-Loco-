@@ -1,39 +1,60 @@
 <html>
+
 <head>
     <title>Pollo Loco - Jump'n Run</title>
     <link rel="stylesheet" href="style.css">
-<script src="game.js"></script>
-<script src="gameover.js"></script>
-<script src="startscreen.js"></script>
+    <script src="game.js"></script>
+    <script src="gameover.js"></script>
+    <script src="startscreen.js"></script>
 
 </head>
-<body onload="initstartscreen()"> 
+
+<body onload="initstartscreen()">
     <!--button after gameover-->
-    <div id="tryagainbutton" class="btn-tryagain d-none zminus10" ><p><a href="index.html"> BACK TO MAIN MENU</a></p></div>
+    <div id="tryagainbutton" class="btn-tryagain d-none zminus10">
+        <p><a href="index.html"> BACK TO MAIN MENU</a></p>
+    </div>
 
+    <!--div with start and help button at game start-->
     <div class="buttoncotainer" id="buttoncotainer">
-    <!--start button at game start-->
-    <div id="startbutton" class="btn-start" onclick="startnewgame()"><p> START NEW GAME</p></div>
+        <div id="startbutton" class="btn-start" onclick="startnewgame()">
+            <p> START NEW GAME</p>
+        </div>
+        <div id="helpbutton" class="btn-help" onclick="openhelp()">
+            <p> INSTRUCTIONS</p>
+        </div>
+    </div>
 
-        <!-- help button at game start-->
-        <div id="helpbutton" class="btn-help" onclick="openhelp()"><p> INSTRUCTIONS</p></div>
+    <!--hidden div with game instructions-->
+    <div class="helpcontainer d-none zminus10" id="helpcontainer" onclick="closehelp()">
+    <div class="help-text">El Pollo Loco is terrorizing your town! <br> Avoid his minions, collect Tabasco bottles & tacos, <br> and make your way to the end of the level. <br>
+        He's waiting for you...</div>
     </div>
 
     <!--header-->
     <h2 class="header1">EL POLLO LOCO</h2>
 
     <!--Canvas game screen-->
-<canvas class="canvas-style" id="canvas" width="720" height="480">
-</canvas>  
+    <canvas class="canvas-style" id="canvas" width="720" height="480">
+    </canvas>
 
-<!--control explanation bottom-->
-<div class="controls-container"> 
-    <div class="controls-row-element"> <img src="./img/howto/arrow-91-128.png" alt="" onclick="moveLeftClick()"><div>Move Left</div></div> 
-    <div class="controls-row-element"> <img src="./img/howto/arrow-27-128.png" alt=""><div>Move Right</div></div>
-    <div class="controls-row-element"> <img src="./img/howto/space-4-128.png" alt=""><div>Jump</div></div>
-    <div class="controls-row-element"> <img src="./img/howto/b-throw.png" alt=""><div>Throw Bottle</div></div>
-    
-</div>
+    <!--control explanation bottom-->
+    <div class="controls-container">
+        <div class="controls-row-element"> <img src="./img/howto/arrow-91-128.png" alt="" onclick="moveLeftClick()">
+            <div>Move Left</div>
+        </div>
+        <div class="controls-row-element"> <img src="./img/howto/arrow-27-128.png" alt="">
+            <div>Move Right</div>
+        </div>
+        <div class="controls-row-element"> <img src="./img/howto/space-4-128.png" alt="">
+            <div>Jump</div>
+        </div>
+        <div class="controls-row-element"> <img src="./img/howto/b-throw.png" alt="">
+            <div>Throw Bottle</div>
+        </div>
+
+    </div>
 
 </body>
+
 </html>
