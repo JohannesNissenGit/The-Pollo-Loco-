@@ -23,6 +23,7 @@ function startnewgame() {
     document.getElementById('helpbutton').classList.add('d-none');
     document.getElementById('helpbutton').classList.add('zminus10');
     document.getElementById('helpbutton').classList.remove('z10');
+    AUDIO_LEVEL_START.play();
     init();
 
 }

@@ -58,13 +58,14 @@ body {
 
 
 .buttoncotainer {
-    margin-top: 80px;
+    margin-top: 300px;
     width:720px;
-    height:450px;
+    height:380px;
    position: fixed;
    display: flex;
-   flex-direction: column;
+   flex-direction: row;
    align-items: center;
+   justify-content: space-around;
 }
 /*start new game button*/
 
@@ -72,9 +73,8 @@ body {
     cursor: pointer;
     border: 5px solid black;
     border-radius: 20px;
-    margin-top: 220px;
-    width: 500px;
-    height: 120px;
+    width: 250px;
+    height: 70px;
     background-color: white;
     display: flex;
     justify-content: center;
@@ -82,7 +82,7 @@ body {
 }
 
 .btn-start p {
-    font-size: 40px;
+    font-size: 22px;
 }
 
 .btn-start a {
@@ -96,9 +96,8 @@ body {
     cursor: pointer;
     border: 5px solid black;
     border-radius: 20px;
-    margin-top: 10px;
-    width: 400px;
-    height: 65px;
+    width: 250px;
+    height: 70px;
     background-color: white;
     display: flex;
     justify-content: center;

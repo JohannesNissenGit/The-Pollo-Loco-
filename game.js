@@ -114,7 +114,8 @@ BOSS_DAMAGE_HIT.volume = 0.6;
 let AUDIO_BOSS_DEFEATED = new Audio('./sounds/Level_complete_1.mp3');
 AUDIO_BOSS_DEFEATED.volume = 0.9;
 
-
+let AUDIO_LEVEL_START = new Audio('./sounds/Level_Start_8bit.mp3')
+AUDIO_LEVEL_START.volume = 0.75;
 
 //---------------------functions-----------------------------------------
 
