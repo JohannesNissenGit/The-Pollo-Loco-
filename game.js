@@ -28,6 +28,9 @@ let characterJumpingGraphicsRight = ['./img/character/03_JUMP/J-34.png', './img/
 let characterJumpingGraphicsLeft = ['./img/character/03_JUMP/J-34.png', './img/character/03_JUMP/J-34.png', './img/character/03_JUMP/J-35.png', './img/character/03_JUMP/J-35.png', './img/character/03_JUMP/J-36.png', './img/character/03_JUMP/J-36.png', './img/character/03_JUMP/J-37.png', './img/character/03_JUMP/J-37.png', './img/character/03_JUMP/J-37.png', './img/character/03_JUMP/J-37.png', './img/character/03_JUMP/J-37.png', './img/character/01_IDLE/IDLE/I-1.png'];
 let characterGraphicsIndex = 0;
 let characterGraphicsJumpingIndex = 0;
+//let characterIdleGraphicsRight = [ './img/character/01_IDLE/IDLE/I-1.png', './img/character/01_IDLE/IDLE/I-2.png', './img/character/03_IDLE/IDLE/I-1.png', './img/character/01_IDLE/IDLE/I-4.png', './img/character/01_IDLE/IDLE/I-5.png', './img/character/01_IDLE/IDLE/I-6.png', './img/character/01_IDLE/IDLE/I-7.png' ];
+let characterIdleGraphicsRight = [ './img/character/01_IDLE/IDLE/I-10.png', './img/character/01_IDLE/IDLE/I-10.png' , './img/character/01_IDLE/IDLE/I-10.png', './img/character/01_IDLE/LONG_IDLE/I-11.png', './img/character/01_IDLE/LONG_IDLE/I-11.png', './img/character/01_IDLE/LONG_IDLE/I-11.png', './img/character/01_IDLE/LONG_IDLE/I-12.png', './img/character/01_IDLE/LONG_IDLE/I-12.png', './img/character/01_IDLE/LONG_IDLE/I-13.png', './img/character/01_IDLE/LONG_IDLE/I-13.png', './img/character/01_IDLE/LONG_IDLE/I-14.png', './img/character/01_IDLE/LONG_IDLE/I-14.png', './img/character/01_IDLE/LONG_IDLE/I-15.png', './img/character/01_IDLE/LONG_IDLE/I-15.png', './img/character/01_IDLE/LONG_IDLE/I-16.png', './img/character/01_IDLE/LONG_IDLE/I-16.png']
+let characterGraphicsIdleIndex = 0;
 
 //background
 let bg_elem_1_x = 0; //foreground x, counters "walking" speed of player 
@@ -52,7 +55,7 @@ let SmallEnemyDefeatedGraphicsIndex = 0;
 let currentBossImage;
 let bossWalkingGraphics = ['./img/enemies/chicken_boss/1_walk/G1.png', './img/enemies/chicken_boss/1_walk/G2.png', './img/enemies/chicken_boss/1_walk/G3.png', './img/enemies/chicken_boss/1_walk/G4.png'];
 let bossWalkingGraphicsIndex = 0;
-let bossDefeatedGraphics = ['./img/enemies/chicken_boss/5_dead/G23.png', './img/enemies/chicken_boss/5_dead/G24.png', './img/enemies/chicken_boss/5_dead/G25.png', './img/enemies/chicken_boss/5_dead/G26.png'];
+let bossDefeatedGraphics = ['./img/enemies/chicken_boss/5_dead/G23.png', './img/enemies/chicken_boss/5_dead/G24.png', './img/enemies/chicken_boss/5_dead/G25.png', './img/enemies/chicken_boss/5_dead/G26.png', './img/enemies/chicken_boss/5_dead/G26.png', './img/enemies/chicken_boss/5_dead/G26.png', './img/enemies/chicken_boss/5_dead/G26.png', './img/enemies/chicken_boss/5_dead/G26.png'];
 let bossDefeatedGraphicsIndex = 0;
 let boss_position_x = 1500; //place where endboss is waiting
 let boss_x;
@@ -191,6 +194,9 @@ function checkForRunning() {
         }
         if (!isMovingLeft && !isMovingRight) {
             AUDIO_RUNNING.pause();
+            let index = characterGraphicsIdleIndex % characterIdleGraphicsRight.length; 
+            currentCharacterImage = characterIdleGraphicsRight[index];
+            characterGraphicsIdleIndex = characterGraphicsIdleIndex + 1;
         }
     }, 60);
 }
@@ -247,21 +253,23 @@ function checkBrownEnemyAnimation() {
  */
 function checkBossAnimation() {
     //if (boss_health > 0) {
-    if (boss_defeated_at == 0) {
-        setInterval(function () {
+    setInterval(function () {
+        if (boss_defeated_at == 0) {
+            //setInterval(function () {
             let index = bossWalkingGraphicsIndex % bossWalkingGraphics.length;
             currentBossImage = bossWalkingGraphics[index];
             bossWalkingGraphicsIndex = bossWalkingGraphicsIndex + 1;
-        }, 100);
-    }
-    //if (boss_health <= 0) {
-    if (boss_defeated_at > 0) {
-        setInterval(function () {
-            let index = BossDefeatedGraphicsIndex % BossDefeatedGraphics.length;
-            currentBossImage = BossDefeatedGraphics[index];
-            let BossDefeatedGraphicsIndex = BossDefeatedGraphicsIndex + 1;
-        }, 200);
-    }
+            //}, 100);
+        }
+        if (boss_health <= 0) {
+            //if (boss_defeated_at > 0) {
+           // setInterval(function () {
+                let index = bossDefeatedGraphicsIndex % bossDefeatedGraphics.length;
+                currentBossImage = bossDefeatedGraphics[index];
+                bossDefeatedGraphicsIndex = bossDefeatedGraphicsIndex + 1;
+                //}, 100);
+            }
+}, 100);
 }
 
 /**
@@ -765,4 +773,12 @@ function listenForKeys() {
         //     lastJumpStarted = new Date().getTime();
         // }
     });
+}
+
+/**
+ * move...Click: simulates pressing keys
+ */
+function moveLeftClick() {
+    var evt = new KeyboardEvent('keypress', { 'keyCode': 37, 'which': 37 });
+    document.dispatchEvent(evt);
 }
