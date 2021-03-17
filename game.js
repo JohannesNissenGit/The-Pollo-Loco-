@@ -116,7 +116,8 @@ let BOSS_DAMAGE_HIT = new Audio('./sounds/glass_broken.mp3');
 BOSS_DAMAGE_HIT.volume = 0.6;
 let AUDIO_BOSS_DEFEATED = new Audio('./sounds/Level_complete_1.mp3');
 AUDIO_BOSS_DEFEATED.volume = 0.9;
-
+let AUDIO_GAMEOVER = new Audio ('./sounds/gameover1.mp3');
+AUDIO_GAMEOVER.volume = 0.8;
 let AUDIO_LEVEL_START = new Audio('./sounds/Level_Start_8bit.mp3')
 AUDIO_LEVEL_START.volume = 0.75;
 
@@ -159,7 +160,10 @@ function init() {
 function checkForGameEnd() {
     setInterval(function () {
         if (character_energy <= 0) {
-            gameover = true;
+            setInterval(function () {
+                gameover = true;
+            }, 700);
+            
         }
         //if (boss_health <= 0) {
         if (bossDefeated) {
@@ -420,7 +424,14 @@ function draw() {
     if (gamewin) {
         console.log('win');
         setTimeout(function () { drawEndScreen(); }, 300)  //go to gameover.js
-    } else {
+    } 
+    else if(gameover) {
+        AUDIO_LOOP.pause();
+        AUDIO_GAMEOVER.play();
+        console.log('lost');
+        setTimeout(function () { drawGameoverScreen(); }, 300)  //go to gameover.js
+    }
+    else {
         updateCharacter();
         drawChicken();
         drawItemBottles();
