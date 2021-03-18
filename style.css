@@ -45,11 +45,13 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: transform .225s; /*Animation*/
+    transition: transform .225s;
+    /*Animation*/
 }
 
 .btn-tryagain:hover {
-    transform: scale(1.2); /*Animation*/
+    transform: scale(1.2);
+    /*Animation*/
 }
 
 .btn-tryagain p {
@@ -61,18 +63,19 @@ body {
     text-decoration: none;
 }
 
-
 /*container, displayed at gamestart*/
+
 .buttoncotainer {
     margin-top: 300px;
-    width:720px;
-    height:380px;
-   position: fixed;
-   display: flex;
-   flex-direction: row;
-   align-items: center;
-   justify-content: space-around;
+    width: 720px;
+    height: 380px;
+    position: fixed;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
 }
+
 /*start new game button*/
 
 .btn-start {
@@ -85,11 +88,13 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: transform .225s; /*Animation*/
+    transition: transform .225s;
+    /*Animation*/
 }
 
 .btn-start:hover {
-    transform: scale(1.1); /*Animation*/
+    transform: scale(1.1);
+    /*Animation*/
 }
 
 .btn-start p {
@@ -113,11 +118,13 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: transform .225s; /*Animation*/
+    transition: transform .225s;
+    /*Animation*/
 }
 
 .btn-help:hover {
-    transform: scale(1.1); /*Animation*/
+    transform: scale(1.1);
+    /*Animation*/
 }
 
 .btn-help p {
@@ -150,8 +157,7 @@ body {
     border-radius: 15px;
 }
 
-
-/*bottom controls style*/
+/*controls panel*/
 
 .controls-container {
     padding-top: 20px;
@@ -183,3 +189,31 @@ body {
     align-items: center;
 }
 
+/*footer*/
+
+.footer {
+    display: flex;
+    justify-content: center;
+    width: 725px;
+    height: 80px;
+}
+
+.footer-row {
+    display: flex;
+    align-items: center;
+}
+
+.footer-element {
+    font-size: 15px;
+}
+
+.footer-element a {
+    text-decoration: none;
+    color: black;
+}
+
+.footer-seperator {
+    font-size: 15px;
+    padding-left: 12px;
+    padding-right: 12px;
+}

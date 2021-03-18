@@ -13,7 +13,6 @@ function initEndscreen() {
 
 
 function drawEndScreen() {
-    console.log('winner');
     ctx.globalAlpha = 0.4;
     ctx.fillStyle = "blue";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -27,7 +26,6 @@ function drawEndScreen() {
 }
 
 function drawGameoverScreen() {
-    console.log('loser');
     ctx.globalAlpha = 0.4;
     ctx.fillStyle = "red";
     ctx.fillRect(0, 0, canvas.width, canvas.height);

@@ -29,7 +29,7 @@ let characterJumpingGraphicsLeft = ['./img/character/03_JUMP/J-34.png', './img/c
 let characterGraphicsIndex = 0;
 let characterGraphicsJumpingIndex = 0;
 //let characterIdleGraphicsRight = [ './img/character/01_IDLE/IDLE/I-1.png', './img/character/01_IDLE/IDLE/I-2.png', './img/character/03_IDLE/IDLE/I-1.png', './img/character/01_IDLE/IDLE/I-4.png', './img/character/01_IDLE/IDLE/I-5.png', './img/character/01_IDLE/IDLE/I-6.png', './img/character/01_IDLE/IDLE/I-7.png' ];
-let characterIdleGraphicsRight = [ './img/character/01_IDLE/IDLE/I-10.png', './img/character/01_IDLE/IDLE/I-10.png' , './img/character/01_IDLE/IDLE/I-10.png', './img/character/01_IDLE/LONG_IDLE/I-11.png', './img/character/01_IDLE/LONG_IDLE/I-11.png', './img/character/01_IDLE/LONG_IDLE/I-11.png', './img/character/01_IDLE/LONG_IDLE/I-12.png', './img/character/01_IDLE/LONG_IDLE/I-12.png', './img/character/01_IDLE/LONG_IDLE/I-13.png', './img/character/01_IDLE/LONG_IDLE/I-13.png', './img/character/01_IDLE/LONG_IDLE/I-14.png', './img/character/01_IDLE/LONG_IDLE/I-14.png', './img/character/01_IDLE/LONG_IDLE/I-15.png', './img/character/01_IDLE/LONG_IDLE/I-15.png', './img/character/01_IDLE/LONG_IDLE/I-16.png', './img/character/01_IDLE/LONG_IDLE/I-16.png']
+let characterIdleGraphicsRight = ['./img/character/01_IDLE/IDLE/I-10.png', './img/character/01_IDLE/IDLE/I-10.png', './img/character/01_IDLE/IDLE/I-10.png', './img/character/01_IDLE/LONG_IDLE/I-11.png', './img/character/01_IDLE/LONG_IDLE/I-11.png', './img/character/01_IDLE/LONG_IDLE/I-11.png', './img/character/01_IDLE/LONG_IDLE/I-12.png', './img/character/01_IDLE/LONG_IDLE/I-12.png', './img/character/01_IDLE/LONG_IDLE/I-13.png', './img/character/01_IDLE/LONG_IDLE/I-13.png', './img/character/01_IDLE/LONG_IDLE/I-14.png', './img/character/01_IDLE/LONG_IDLE/I-14.png', './img/character/01_IDLE/LONG_IDLE/I-15.png', './img/character/01_IDLE/LONG_IDLE/I-15.png', './img/character/01_IDLE/LONG_IDLE/I-16.png', './img/character/01_IDLE/LONG_IDLE/I-16.png']
 let characterGraphicsIdleIndex = 0;
 
 //background
@@ -116,7 +116,7 @@ let BOSS_DAMAGE_HIT = new Audio('./sounds/glass_broken.mp3');
 BOSS_DAMAGE_HIT.volume = 0.6;
 let AUDIO_BOSS_DEFEATED = new Audio('./sounds/Level_complete_1.mp3');
 AUDIO_BOSS_DEFEATED.volume = 0.9;
-let AUDIO_GAMEOVER = new Audio ('./sounds/gameover1.mp3');
+let AUDIO_GAMEOVER = new Audio('./sounds/gameover1.mp3');
 AUDIO_GAMEOVER.volume = 0.8;
 let AUDIO_LEVEL_START = new Audio('./sounds/Level_Start_8bit.mp3')
 AUDIO_LEVEL_START.volume = 0.75;
@@ -163,7 +163,7 @@ function checkForGameEnd() {
             setInterval(function () {
                 gameover = true;
             }, 700);
-            
+
         }
         //if (boss_health <= 0) {
         if (bossDefeated) {
@@ -198,7 +198,7 @@ function checkForRunning() {
         }
         if (!isMovingLeft && !isMovingRight) {
             AUDIO_RUNNING.pause();
-            let index = characterGraphicsIdleIndex % characterIdleGraphicsRight.length; 
+            let index = characterGraphicsIdleIndex % characterIdleGraphicsRight.length;
             currentCharacterImage = characterIdleGraphicsRight[index];
             characterGraphicsIdleIndex = characterGraphicsIdleIndex + 1;
         }
@@ -267,13 +267,13 @@ function checkBossAnimation() {
         }
         if (boss_health <= 0) {
             //if (boss_defeated_at > 0) {
-           // setInterval(function () {
-                let index = bossDefeatedGraphicsIndex % bossDefeatedGraphics.length;
-                currentBossImage = bossDefeatedGraphics[index];
-                bossDefeatedGraphicsIndex = bossDefeatedGraphicsIndex + 1;
-                //}, 100);
-            }
-}, 100);
+            // setInterval(function () {
+            let index = bossDefeatedGraphicsIndex % bossDefeatedGraphics.length;
+            currentBossImage = bossDefeatedGraphics[index];
+            bossDefeatedGraphicsIndex = bossDefeatedGraphicsIndex + 1;
+            //}, 100);
+        }
+    }, 100);
 }
 
 /**
@@ -372,7 +372,6 @@ function checkCollisionBoss() {
                 AUDIO_LOOP.pause();
                 AUDIO_BOSS_DEFEATED.play();
                 bossDefeated = true;
-                console.log('bossdefeated');
             }
         }
     }
@@ -422,13 +421,11 @@ function BossinvincibilityAfterDamage() {
 function draw() {
     drawBackground();
     if (gamewin) {
-        console.log('win');
         setTimeout(function () { drawEndScreen(); }, 300)  //go to gameover.js
-    } 
-    else if(gameover) {
+    }
+    else if (gameover) {
         AUDIO_LOOP.pause();
         AUDIO_GAMEOVER.play();
-        console.log('lost');
         setTimeout(function () { drawGameoverScreen(); }, 300)  //go to gameover.js
     }
     else {
@@ -709,7 +706,7 @@ function drawBoss() {
     if (boss_defeated_at > 0) {
         let timePassed = new Date().getTime() - boss_defeated_at;
         //if (timePassed < 800) {
-        boss_x = boss_x + timePassed * 0.3;
+        boss_x = boss_x + timePassed * 0.2;
         let gravityAdded = Math.pow(GRAVITY, timePassed / 200);
         boss_y = 60 - (timePassed * 0.2 - gravityAdded);
         addBackgroundObject(currentBossImage, boss_x, boss_y, 0.3);
