@@ -155,6 +155,7 @@ body {
     width: 500px;
     background-color: lightgrey;
     border-radius: 15px;
+    border: 2px solid black;
 }
 
 /*controls panel*/
