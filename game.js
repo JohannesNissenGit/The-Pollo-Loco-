@@ -120,6 +120,9 @@ let AUDIO_GAMEOVER = new Audio('./sounds/gameover1.mp3');
 AUDIO_GAMEOVER.volume = 0.8;
 let AUDIO_LEVEL_START = new Audio('./sounds/Level_Start_8bit.mp3')
 AUDIO_LEVEL_START.volume = 0.75;
+let AUDIO_STARTSCREEN_LOOP = new Audio('./sounds/intro_loop.mp3')
+AUDIO_STARTSCREEN_LOOP.loop = true;
+AUDIO_LEVEL_START.volume = 0.75;
 
 //---------------------functions-----------------------------------------
 

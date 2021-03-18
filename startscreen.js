@@ -14,6 +14,7 @@ function initstartscreen() {
     document.getElementById('tryagainbutton').classList.add('d-none');
     document.getElementById('tryagainbutton').classList.add('zminus10');
     document.getElementById('tryagainbutton').classList.remove('z10');
+    AUDIO_STARTSCREEN_LOOP.play();
 }
 
 function startnewgame() {
@@ -23,6 +24,7 @@ function startnewgame() {
     document.getElementById('helpbutton').classList.add('d-none');
     document.getElementById('helpbutton').classList.add('zminus10');
     document.getElementById('helpbutton').classList.remove('z10');
+    AUDIO_STARTSCREEN_LOOP.pause();
     AUDIO_LEVEL_START.play();
     init();
 
