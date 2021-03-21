@@ -63,7 +63,7 @@ let bossWalkingGraphics = ['./img/enemies/chicken_boss/1_walk/G1.png', './img/en
 let bossWalkingGraphicsIndex = 0;
 let bossDefeatedGraphics = ['./img/enemies/chicken_boss/5_dead/G23.png', './img/enemies/chicken_boss/5_dead/G24.png', './img/enemies/chicken_boss/5_dead/G25.png', './img/enemies/chicken_boss/5_dead/G26.png', './img/enemies/chicken_boss/5_dead/G26.png', './img/enemies/chicken_boss/5_dead/G26.png', './img/enemies/chicken_boss/5_dead/G26.png', './img/enemies/chicken_boss/5_dead/G26.png'];
 let bossDefeatedGraphicsIndex = 0;
-let boss_position_x = 1500; //place where endboss is waiting
+let boss_position_x = 2300; //place where endboss is waiting
 let boss_x;
 let boxx_y;
 let boss_health = 100;
@@ -71,7 +71,7 @@ let boss_defeated_at = 0;
 let bosstimeoutInvincible = false;
 
 //items
-let placedBottles = [200, 600, 990, 1700, 2450];
+let placedBottles = [200, 600, 990, 1950, 2150];
 let collectedBottles = 4;
 let bottleThrowTime = 0;
 let thrownBottle_x = 0; //x position of thrown object
@@ -80,8 +80,8 @@ let thrownbottleCurrentImage;
 let thrownbottleGraphics = ['./img/items/Bottle_Tabasco/rotation/rotate1_0.png', './img/items/Bottle_Tabasco/rotation/rotate2_90.png', './img/items/Bottle_Tabasco/rotation/rotate3_180.png', './img/items/Bottle_Tabasco/rotation/rotate4_270.png'];
 let thrownbottleGraphicsIndex = 0;
 let tacos = [
-    { "tacoposition_x": 800, "tacoposition_y": 340, "tacoscale": 0.15 },
-    { "tacoposition_x": 1100, "tacoposition_y": 340, "tacoscale": 0.15 }
+    { "tacoposition_x": 1000, "tacoposition_y": 340, "tacoscale": 0.15 },
+    { "tacoposition_x": 1600, "tacoposition_y": 340, "tacoscale": 0.15 }
 ];
 
 
@@ -740,6 +740,12 @@ function createEnemyList() {
         createChicken('yellow', bg_elem_1_x + 900, 3),
         createChicken('yellow', bg_elem_1_x + 1000, (Math.random() * 5)),
         createChicken('brown', bg_elem_1_x + 1200, 2),
+        createChicken('yellow', bg_elem_1_x + 2000, 3),
+        createChicken('brown', bg_elem_1_x + 2400, 3),
+        createChicken('brown', bg_elem_1_x + 2800, 2),
+        createChicken('yellow', bg_elem_1_x + 3000, 2),
+        createChicken('yellow', bg_elem_1_x + 3500, 3),
+        createChicken('brown', bg_elem_1_x + 3700, 3),
     ]
 }
 
