@@ -1,7 +1,8 @@
 let startimage;
 
 function initstartscreen() {
-    initPreload();
+    //initPreload();
+    preloadImages();
     canvas = document.getElementById('canvas');
     ctx = canvas.getContext("2d");
     ctx.fillStyle = 'white';

@@ -107,6 +107,9 @@ AUDIO_JUMPING.volume = 0.6;
 let AUDIO_LOOP = new Audio('./sounds/mariachi.mp3');
 AUDIO_LOOP.loop = true;
 AUDIO_LOOP.volume = 0.1;
+let AUDIO_LOOP_CLUCKING = new Audio('./sounds/chickens_clucking.mp3');
+AUDIO_LOOP_CLUCKING.loop = true;
+AUDIO_LOOP_CLUCKING.volume = 0.5;
 let AUDIO_BOTTLE_PICKUP = new Audio('./sounds/powerup_2.mp3');
 AUDIO_BOTTLE_PICKUP.volume = 0.6;
 let AUDIO_BOTTLE_THROW = new Audio('./sounds/bottle_throw_short.mp3');
@@ -117,6 +120,8 @@ let PLAYER_DAMAGE_HIT = new Audio('./sounds/character_damage_uu.mp3');
 PLAYER_DAMAGE_HIT.volume = 0.7;
 let BOSS_DAMAGE_HIT = new Audio('./sounds/glass_broken.mp3');
 BOSS_DAMAGE_HIT.volume = 0.6;
+let AUDIO_BOSS_DEATH = new Audio('./sounds/chicken_alarm.mp3');
+AUDIO_BOSS_DEATH.volume = 0.8;
 let AUDIO_BOSS_DEFEATED = new Audio('./sounds/Level_complete_1.mp3');
 AUDIO_BOSS_DEFEATED.volume = 0.9;
 let AUDIO_GAMEOVER = new Audio('./sounds/gameover1.mp3');
@@ -135,6 +140,7 @@ AUDIO_LEVEL_START.volume = 0.75;
  */
 async function StartMusic() {
     AUDIO_LOOP.play();
+    AUDIO_LOOP_CLUCKING.play();
 }
 
 /**
@@ -376,6 +382,7 @@ function checkCollisionBoss() {
             if (boss_health <= 0) {
                 boss_defeated_at = new Date().getTime();
                 AUDIO_LOOP.pause();
+                AUDIO_BOSS_DEATH.play();
                 AUDIO_BOSS_DEFEATED.play();
                 bossDefeated = true;
             }
@@ -461,6 +468,7 @@ function drawStatusbar() {
     }
 }
 
+
 //---------player model--------------------
 
 /**
@@ -468,9 +476,13 @@ function drawStatusbar() {
  */
 
 function updateCharacter() {
-    let base_image = new Image();
-    base_image.src = currentCharacterImage;
+    // let base_image = new Image(); //working
+    //base_image.src = currentCharacterImage;   //working
 
+    //checkBackgroundImageCache(currentCharacterImage);
+    let src_path = currentCharacterImage;
+
+    let base_image = getBackgroundImageFromCache(src_path);
     let timePassedSinceJump = new Date().getTime() - lastJumpStarted;
     if (timePassedSinceJump < JUMP_TIME_UP) {
         isJumping = true;
@@ -491,6 +503,9 @@ function updateCharacter() {
     };
 }
 
+/**
+ * draws healthbar 
+ */
 function drawEnergybar() {
     ctx.globalAlpha = 0.9;
     ctx.fillStyle = "white"; //frame energybar
@@ -500,6 +515,9 @@ function drawEnergybar() {
     ctx.globalAlpha = 1;
 }
 
+/**
+ * initiates bottle throw and checks timing
+ */
 function ThrowBottle() {
     let timePassed = new Date().getTime() - bottleThrowTime;
     if (timePassed > 800) {
@@ -514,14 +532,52 @@ function ThrowBottle() {
 //------------Objects-------------------------
 
 /**
+ * this function looks for graphics in cache
+ */
+
+/*function getBackgroundImageFromCache(src_path) { //OLD FUNCTION, STOPS AT ERRORS
+
+    // Check if image is found in images-array.
+
+    return images.find(function (img) {
+        return img.src.endsWith(src_path.substring(3, src_path.length));
+
+    });
+ 
+}*/
+
+
+
+
+function getBackgroundImageFromCache(src_path) {
+
+    
+    let base_image;
+    try { //try and check if image is found in cache
+        base_image = images.find(function (img) {
+            return img.src.endsWith(src_path.substring(3, src_path.length));
+        })
+    }
+
+    catch (err) { //if no image is found, create new one
+        base_image = new Image();
+        base_image.src = src_path;
+        images.push(base_image);
+    }
+    return base_image;
+}
+
+/**
  * drawBackground: background display
  */
 function drawBackground() {
     ctx.fillStyle = 'white';
+    //ctx.fillStyle = 'rgba(153, 68, 9, 1)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    let sky = new Image(); //skybox
-    sky.src = './img/background/05_Sky_1920-1080px.png';
+    //let sky = new Image(); //skybox   //working, but not loading from cache
+    //sky.src = './img/background/05_Sky_1920-1080px.png'; //working, but not loading from cache
+    let sky = getBackgroundImageFromCache('./img/background/05_Sky_1920-1080px.png');
     if (sky.complete) {
         ctx.drawImage(sky, 0, 0, sky.width * 0.4, sky.height * 0.4);
     }
@@ -535,7 +591,7 @@ function drawGround() {
     //ctx.fillStyle = '#FFE699';  //old ground layer
     //ctx.fillRect(0, 375, canvas.width, canvas.height - 375);
     addBackgroundObject('./img/background/06_Ground.png', 0, 320, 0.4);  //ground layer
-    if (isMovingRight && bg_elem_1_x > LEVEL_WALL_FINISH) { //&& bg_elem_1_x < LEVEL_WALL_FINISH)
+    if (isMovingRight && bg_elem_1_x > LEVEL_WALL_FINISH) {
         bg_elem_1_x = bg_elem_1_x - GAME_SPEED;
         bg_elem_2_x = bg_elem_2_x - (0.5 * GAME_SPEED);
         bg_elem_3_x = bg_elem_3_x - (0.35 * GAME_SPEED);
@@ -561,8 +617,9 @@ function drawGround() {
  * addBackgroundObject: general function to create background objects 
  */
 function addBackgroundObject(src, offsetX, offsetY, scale) {
-    let base_image = new Image();
-    base_image.src = src;
+    //let base_image = new Image();
+    //base_image.src = src;
+    let base_image = getBackgroundImageFromCache(src);
     if (base_image.complete) {
         ctx.drawImage(base_image, offsetX, offsetY, base_image.width * scale, base_image.height * scale);
     }
@@ -673,7 +730,7 @@ function calculateChickenPosition() {
 function drawChicken() {
     for (i = 0; i < chickens.length; i++) {
         let enemy = chickens[i];
-        //if (enemy.defeated = false) {
+        //if (!enemy.defeated) {
         //addBackgroundObject(enemy.img, enemy.position_x, enemy.position_y, enemy.scale);
         if (enemy.type == 'yellow')
             addBackgroundObject(currentSmallYellowEnemyimage, enemy.position_x, enemy.position_y, enemy.scale);
