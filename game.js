@@ -71,7 +71,7 @@ let boss_defeated_at = 0;
 let bosstimeoutInvincible = false;
 
 //items
-let placedBottles = [200, 600, 990, 1950, 2150];
+let placedBottles = [200, 600, 1200, 1950, 2150];
 let collectedBottles = 4;
 let bottleThrowTime = 0;
 let thrownBottle_x = 0; //x position of thrown object
