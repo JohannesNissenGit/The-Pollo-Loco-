@@ -32,9 +32,12 @@ let characterJumpingGraphicsLeft = ['./img/character/03_JUMP/J-L-34.png', './img
 let characterGraphicsIndex = 0;
 let characterGraphicsJumpingIndex = 0;
 //let characterIdleGraphicsRight = [ './img/character/01_IDLE/IDLE/I-1.png', './img/character/01_IDLE/IDLE/I-2.png', './img/character/03_IDLE/IDLE/I-1.png', './img/character/01_IDLE/IDLE/I-4.png', './img/character/01_IDLE/IDLE/I-5.png', './img/character/01_IDLE/IDLE/I-6.png', './img/character/01_IDLE/IDLE/I-7.png' ];
-let characterIdleGraphicsRight = ['./img/character/01_IDLE/IDLE/I-10.png', './img/character/01_IDLE/IDLE/I-10.png', './img/character/01_IDLE/IDLE/I-10.png', './img/character/01_IDLE/LONG_IDLE/I-11.png', './img/character/01_IDLE/LONG_IDLE/I-11.png', './img/character/01_IDLE/LONG_IDLE/I-11.png', './img/character/01_IDLE/LONG_IDLE/I-12.png', './img/character/01_IDLE/LONG_IDLE/I-12.png', './img/character/01_IDLE/LONG_IDLE/I-13.png', './img/character/01_IDLE/LONG_IDLE/I-13.png', './img/character/01_IDLE/LONG_IDLE/I-14.png', './img/character/01_IDLE/LONG_IDLE/I-14.png', './img/character/01_IDLE/LONG_IDLE/I-15.png', './img/character/01_IDLE/LONG_IDLE/I-15.png', './img/character/01_IDLE/LONG_IDLE/I-16.png', './img/character/01_IDLE/LONG_IDLE/I-16.png']
+let characterIdleGraphicsRight = ['./img/character/01_IDLE/IDLE/I-10.png', './img/character/01_IDLE/IDLE/I-10.png', './img/character/01_IDLE/IDLE/I-10.png', './img/character/01_IDLE/LONG_IDLE/I-11.png', './img/character/01_IDLE/LONG_IDLE/I-11.png', './img/character/01_IDLE/LONG_IDLE/I-11.png', './img/character/01_IDLE/LONG_IDLE/I-12.png', './img/character/01_IDLE/LONG_IDLE/I-12.png', './img/character/01_IDLE/LONG_IDLE/I-13.png', './img/character/01_IDLE/LONG_IDLE/I-13.png', './img/character/01_IDLE/LONG_IDLE/I-14.png', './img/character/01_IDLE/LONG_IDLE/I-14.png', './img/character/01_IDLE/LONG_IDLE/I-15.png', './img/character/01_IDLE/LONG_IDLE/I-15.png', './img/character/01_IDLE/LONG_IDLE/I-16.png', './img/character/01_IDLE/LONG_IDLE/I-16.png'];
+let characterIdleGraphicsLeft = ['./img/character/01_IDLE/IDLE/I-L-10.png', './img/character/01_IDLE/IDLE/I-L-10.png', './img/character/01_IDLE/IDLE/I-L-10.png', './img/character/01_IDLE/LONG_IDLE/I-L-11.png', './img/character/01_IDLE/LONG_IDLE/I-L-11.png', './img/character/01_IDLE/LONG_IDLE/I-L-11.png', './img/character/01_IDLE/LONG_IDLE/I-L-12.png', './img/character/01_IDLE/LONG_IDLE/I-L-12.png', './img/character/01_IDLE/LONG_IDLE/I-L-13.png', './img/character/01_IDLE/LONG_IDLE/I-L-13.png', './img/character/01_IDLE/LONG_IDLE/I-L-14.png', './img/character/01_IDLE/LONG_IDLE/I-L-14.png', './img/character/01_IDLE/LONG_IDLE/I-L-15.png', './img/character/01_IDLE/LONG_IDLE/I-L-15.png', './img/character/01_IDLE/LONG_IDLE/I-L-16.png', './img/character/01_IDLE/LONG_IDLE/I-L-16.png'];
 let characterGraphicsIdleIndex = 0;
-
+let characterGraphicsHurtRight = ['./img/character/04_INJURED/H-42.png', './img/character/04_INJURED/H-42.png', './img/character/04_INJURED/H-42.png', './img/character/04_INJURED/H-43.png', './img/character/04_INJURED/H-43.png', './img/character/04_INJURED/H-43.png'];
+let characterGraphicsHurtLeft = ['./img/character/04_INJURED/H-L-41.png', './img/character/04_INJURED/H-L-42.png', './img/character/04_INJURED/H-L-43.png'];
+let characterGraphicsHurtIndex = 0;
 //background
 let bg_elem_1_x = 0; //foreground x, counters "walking" speed of player 
 let bg_elem_2_x = 0;
@@ -154,6 +157,7 @@ function init() {
     createEnemyList();
     checkForRunning();
     checkForJumping();
+    checkForInjured();
     checkYellowEnemyAnimation();
     checkBrownEnemyAnimation();
     checkBossAnimation();
@@ -208,12 +212,19 @@ function checkForRunning() {
             characterGraphicsIndex = characterGraphicsIndex + 1;
             PlayerLastDirection = 'left';
         }
-        if (!isMovingLeft && !isMovingRight) {
+        if (!isMovingLeft && !isMovingRight && PlayerLastDirection == 'right') {
             AUDIO_RUNNING.pause();
             let index = characterGraphicsIdleIndex % characterIdleGraphicsRight.length;
             currentCharacterImage = characterIdleGraphicsRight[index];
             characterGraphicsIdleIndex = characterGraphicsIdleIndex + 1;
         }
+        if (!isMovingLeft && !isMovingRight && PlayerLastDirection == 'left') {
+            AUDIO_RUNNING.pause();
+            let index = characterGraphicsIdleIndex % characterIdleGraphicsLeft.length;
+            currentCharacterImage = characterIdleGraphicsLeft[index];
+            characterGraphicsIdleIndex = characterGraphicsIdleIndex + 1;
+        }
+        
     }, 60);
 }
 
@@ -233,6 +244,24 @@ function checkForJumping() {
             characterGraphicsJumpingIndex = characterGraphicsJumpingIndex + 1;
         }
     }, 50);
+}
+
+/**
+ * checkForInjured(): checks if player is hit or in invincibility-phase and adjusts animation
+ */
+function checkForInjured() {
+   /* setInterval(function () {
+        if (timeoutInvincible && PlayerLastDirection == 'right') {
+            let index = characterGraphicsHurtIndex % characterGraphicsHurtRight.length;
+            currentCharacterImage = characterGraphicsHurtRight[index];
+            characterGraphicsHurtIndex = characterGraphicsHurtIndex + 1;
+        }
+        if (timeoutInvincible && PlayerLastDirection == 'left') {
+            let index = characterGraphicsHurtIndex % characterGraphicsHurtLeft.length;
+            currentCharacterImage = characterGraphicsHurtLeft[index];
+            characterGraphicsHurtIndex = characterGraphicsHurtIndex + 1;
+        }
+    },50);*/
 }
 /**
  * checkEnemyAnimation(): iterates enemy walking and dying animation
@@ -434,12 +463,14 @@ function BossinvincibilityAfterDamage() {
 function draw() {
     drawBackground();
     if (gamewin) {
+        AUDIO_LOOP_CLUCKING.pause();
         setTimeout(function () { drawEndScreen(); }, 300)  //go to gameover.js
     }
     else if (gameover) {
         AUDIO_LOOP.pause();
+        AUDIO_LOOP_CLUCKING.pause();
         AUDIO_GAMEOVER.play();
-        setTimeout(function () { drawGameoverScreen(); }, 300)  //go to gameover.js
+        setTimeout(function () { drawGameoverScreen(); }, 150)  //go to gameover.js
     }
     else {
         updateCharacter();

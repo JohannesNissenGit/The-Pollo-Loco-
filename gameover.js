@@ -32,7 +32,7 @@ function drawGameoverScreen() {
     ctx.globalAlpha = 1;
     ctx.font = '130px Impact' //text
     ctx.fillStyle = 'white';
-    ctx.fillText('YOU LOST! ', 150, 220);
+    ctx.fillText('YOU LOST! ', 120, 220);
     document.getElementById('tryagainbutton').classList.remove('d-none');
     document.getElementById('tryagainbutton').classList.remove('zminus10');
     document.getElementById('tryagainbutton').classList.add('z10');
